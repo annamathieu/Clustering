@@ -1,0 +1,62 @@
+---
+title: "Clustering : Classif non supervisée"
+author: "Groupe 5 (Maeva, Matéo, Mélina, Marine, Anna)"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    toc_float: true
+    self_contained: true
+    df_print: paged
+    highlight: tango
+    theme:
+      version: 4
+      bootswatch: flatly
+      bg: aliceblue
+      fg: '#000000'
+      primary: '#F2186E'
+      base_font: Lato
+      heading_font: Playfair Display
+      code_font: Fira Code
+    tabset: true
+    
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F, fig.height=3, fig.width=4)
+```
+
+
+```{r, include = FALSE}
+setwd("C:/documents/Agrocampus/M2/Classification_Non_Supervisee/RmD/Clustering")
+
+sections.path <- file.path(rprojroot::find_root("Clustering.Rproj"),
+                           "bilan",
+                           "seances")
+r.files.vec <- list.files(sections.path)
+r.files.vec <- r.files.vec[grepl(".Rmd", r.files.vec)]
+```
+
+# Seance 1
+```{r child = 'seances/cours1.Rmd'}
+
+```
+
+# Seance 2 
+```{r child = 'seances/cours2.Rmd'}
+
+```
+
+# Seance 3
+```{r child = 'seances/cours3.Rmd'}
+
+```
+
+# Seance 4 
+```{r child = 'seances/cours4.Rmd'}
+
+```
+

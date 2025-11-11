@@ -1,0 +1,50 @@
+---
+title: "Classification Non Supervisée , cours 1"
+author: "Anna Mathieu"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Récupération des données, centrage et calculs matriciels
+
+```{r}
+library(FactoMineR)
+
+# Données
+data("decathlon")
+X <- as.matrix(decathlon[,1:10])
+n <- nrow(X)
+p <- ncol(X)
+
+# 1) Centrage
+moy <- colMeans(X)
+moy_mat <- matrix(1, n, 1) %*% t(moy)
+X_centree <- X - moy_mat
+
+# Vérification du centrage
+colMeans(X_centree)
+
+# 2) Matrice Variance-Covariance par produit matriciel
+varcov_matr <- (t(X_centree) %*% X_centree) / (n - 1)
+
+# Vérification
+all.equal(varcov_matr, cov(X))
+
+# 3) Matrice de Corrélation par standardisation matricielle
+ecarts_types <- sqrt(diag(varcov_matr))
+D_inv <- diag(1/ecarts_types)
+coeff_cor <- D_inv %*% varcov_matr %*% D_inv
+
+# Vérification
+all.equal(coeff_cor, cor(X))
+
+# 4) Matrice r² puis matrice des distances
+coeff_cor2 <- coeff_cor^2
+dist_matr <- 1 - coeff_cor2
+
+# Nom des lignes / colonnes
+names <- colnames(X)
+rownames(dist_matr) <- names
+colnames(dist_matr) <- names
+
+dist_matr
