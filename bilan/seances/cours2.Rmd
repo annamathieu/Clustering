@@ -1,8 +1,254 @@
 ---
-title: "Classification Non Supevisée , cours 1"
+title: "Bilan de la séance 2 : CAH et partitionnement direct"
 author: "Anna Mathieu"
 date: "`r Sys.Date()`"
 output: html_document
 ---
+En classification, l’objectif est de regrouper des individus (ou objets) présentant des caractéristiques similaires selon certaines variables.
 
-Tout ce que nous avons retenu du cours 2!
+## Stratégies de classification
+
+Il existe deux grandes stratégies :
+
+- **Méthode divisive**  
+  Approche descendante : on travaille sur les variables et on divise progressivement l’ensemble en sous-groupes.
+
+- **Méthode agrégative**  
+  Approche ascendante : on part d’objets isolés et on regroupe progressivement les individus en classes jusqu’à obtenir une partition finale.
+
+## Partition
+
+Une **partition** est un découpage complet d’un ensemble d’individus en sous-ensembles disjoints :
+- Aucun individu n’appartient à deux classes à la fois.
+- L’union de toutes les classes reconstitue l’ensemble initial.
+
+Dans une **partition floue**, un individu peut appartenir partiellement à plusieurs classes, via des **probabilités d’appartenance**.  
+Cela conduit à des approches dites probabilités, basées sur la modélisation de variables aléatoires.
+
+Lorsque les variables sont continues, on suppose qu’elles suivent une **loi normale (ou gaussienne)**, caractérisée par :
+- une moyenne : \\(\mu\\)
+- une variance : \\(\sigma^2\\)
+
+Pour plusieurs variables simultanément, on utilise un **vecteur gaussien** (loi normale multivariée), défini par :
+- un vecteur de moyennes : \\((\mu_1, \mu_2, ..., \mu_p)\\)
+- une matrice variance–covariance
+
+---
+
+# Topic Modelling
+
+Le *topic modelling* est une méthode de classification non supervisée appliquée aux textes.
+
+Un **topic** (ou « sujet ») correspond à une **distribution de mots récurrents** dans un corpus.
+
+Les objectifs sont :
+- Estimer la **proportion de chaque topic dans chaque document**.  
+- Identifier les **mots caractéristiques** associés à chaque topic.
+
+La méthode générale :
+1. Identifier les topics dans chaque texte.  
+2. Nommer les variables latentes (topics) selon les mots les plus fréquents.  
+3. Fusionner les tableaux représentant les topics.  
+4. Calculer les distances entre topics.  
+5. Appliquer une analyse multidimensionnelle pour visualiser les proximités.
+
+---
+
+# Classification des données
+
+Les données d’entrée d’un algorithme de classification peuvent être :
+- un **tableau individus × variables** (n × p),
+- une **matrice de distances** entre individus.
+
+## Classification hiérarchique ascendante (CAH)
+
+La classification hiérarchique ascendante (CAH) est une méthode agrégative, où on part de n classes (chaque individu seul), on fusionne à chaque étape les classes les plus proches et on obtient un dendrogramme (ou arbre hiérarchique) qui montre les niveaux de regroupement. 
+
+Cette méthode est adaptée aux variables quantitatives (une variable correspond à une dimension) et aux variables qualitatives (une modalité correspond à une dimension). 
+
+---
+
+# Partitionnement direct
+
+Le partitionnement direct consiste à **diviser un ensemble d’individus en un nombre fixe de classes**, sans construction hiérarchique (contrairement à la CAH).
+
+La particularité de ces méthodes est que le nombre de classes doit être déterminé à l’avance. On ne construit pas progressivement les regroupements. On part d’une hypothèse de départ (“je veux former k groupes”) et l’algorithme cherche la meilleure façon de séparer les individus en k classes. 
+
+L'objectif est de répartir les individus de sorte que : 
+
+- Les individus d’une même classe soient aussi proche que possible les uns des autres, autrement dit on cherche à minimiser la variabilité intra-classe.
+
+- Les classes entre elles soient aussi éloignés que possible, autrement dit on cherche à maximiser la variabilité inter-classe.
+
+Le processus : 
+- On commence par choisir k centres de classes. Ces centres sont souvent choisis au hasard parmi les individus. Chaque centre représente le centre de gravité d’une classe, c’est-à-dire un point moyen dans l’espace des variables. 
+
+- Chaque individu est affecté à la classe dont le centre est le plus proche selon une mesure de distance. 
+
+- Une fois tous les individus affectés à une classe, on recalcule le centre de chaque classe, appelé centre de classe virtuel. 
+
+- Après le recalcul, certains individus peuvent se retrouver plus proches d’un autre centre. On les affecte alors à la nouvelle classe la plus proche. 
+
+On répète ces deux étapes (recalcul des centres et réaffectation), jusqu’à convergence de l’algorithme où la variabilité intra-classe est minimale et la variabilité inter-classe est maximale. 
+
+Un exemple est le k-means, où le calcul des centres de gravité se fait au fur et à mesure de l’affectation de chaque individu. 
+
+## Méthodes mixtes
+Les méthodes mixtes combinent le partitionnement direct et la CAH. On réalise un partitionnement direct pour obtenir des centres de classes initiaux et on applique une CAH sur ces centres. Cela permet de réduire le nombre d’individus pour réaliser la CAH.
+
+# TD : étude appliqué sur le saumon 
+
+On dispose d’un jeu de donné structuré en 3 blocs :
+
+- Un bloc « rouge » : avec les individus en lignes et les saumons en colonnes. Ce bloc contient les notes hédoniques attribuées par chaque individu à chaque saumon.
+
+- Un bloc « bleu » : placé à droite du bloc rouge, il comporte les mêmes individus en lignes, mais avec des variables qualitatives en colonnes. Ce bloc décrit les habitudes de consommation du saumon pour chaque individu.
+
+- Un bloc « noir » : situé sous le bloc rouge, il présente les saumons en colonnes et les paramètre physico-chimiques (inconnus des individus) en lignes.
+
+
+
+__Problématique : le “problème du 4ème coin”.__ 
+L’objectif est de comprendre comment les préférences hédoniques des consommateurs s’articulent avec leurs habitudes de consommation et les caractéristiques physico-chimiques des produits. Autrement dit, de vérifier si ce qu’expriment les individus à propos de leur consommation en saumon est exacte ou non.
+
+Pour cela, on va : 
+ - Classer les consommateurs selon leurs préférences hédoniques.
+
+- Caractériser les classes obtenues à l’aide des variables d’usage (issues du bloc bleu) pour mieux comprendre la structure hédonique. 
+
+- Evaluer l’apport des données physico-chimiques (bloc noir) dans la compréhension des préférences hédoniques par les variables d’usage.
+
+Cette approche permet notamment de vérifier si les déclarations des individus concernant leur consommation de saumon sont cohérentes avec la réalité. Par exemple, si un groupe d’individus affirment préférer les saumons salés (variable Not.to.salty_No du bloc bleu), on devrait observer une corrélation avec le paramètre « salt » du bloc noir. Cela confirmerait la fiabilité de leurs descriptions sensorielles et la pertinence de leurs jugements lors de la notation des produits.
+
+Nous allons procéder en 3 étapes :
+
+**Etape 1 :** Analyse du bloc rouge (individus x saumons)
+L’objectif : regrouper les individus selon leurs préférences hédoniques vis-à-vis des différents saumons. 
+
+Méthode : 
+
+- Réalisation d’un ACP (PCA()) sur les variables quantitatives du bloc rouge
+
+- Suivie d’une classification hiérarchique (HCPC()) pour identifier des clusters d’individus aux comportements similaires.
+
+**Etape 2 :** Interprétation à l’aide du bloc bleu (individus x conditions de consommation)
+
+L’objectif : interpréter les classes obtenues à l’étape précédente en fonction des variables qualitatives décrivant les habitudes ou préférences de consommation.  Ceci doit permettre de justifier les différences de notes entre individus et d’identifier les descripteurs discriminants pour chaque groupe. 
+
+Méthode : 
+
+- Réaliser une ACP avec les variables quantitatives du bloc rouge comme actives et les variables catégorielles du bloc bleu comme supplémentaires. 
+- Utiliser la fonction desc.var() pour extraire les variables les plus significatives.
+
+**Etape 3 :** Validation à l’aide du bloc noir (paramètres physico-chimiques x saumons)
+
+Objectif : confirmer la cohérence des justifications données par les individus en les confrontant aux mesures physico-chimiques réelles. Cette étape vise à évaluer la pertinence du panel en matière de jugement sensoriel.
+
+Chaque paramètre physico-chimique est considéré comme un individu supplémentaire fictif, très sensible au critère correspondant. 
+
+Ainsi, un individu “Salt” notera favorablement les saumons les plus salés, il se positionne donc dans l’espace factoriel près des individus ayant eux aussi attribué de bonnes notes à ces produits. Cela nous permettra de rendre légitime ou non la note des vrais individus, conditionnellement aux appréciations de consommation de chaque vrai individu (bloc bleu).
+
+Méthode : 
+
+- Réaliser une ACP avec les variables quantitatives du bloc rouge comme actives, les variables catégorielles du bloc bleu comme supplémentaires et les paramètres du bloc noir comme individus supplémentaires
+
+- Terminer par une HCPC() pour observer à quelles classes se rattachent les individus
+
+## Interprétations
+L’analyse hiérarchique sur composantes principales (HCPC) réalisée sur le jeu de données dta_saumon a permis d’identifier trois groupes distincts de consommateurs selon leurs perceptions sensorielles, leurs jugements qualitatifs et leurs préférences à l’égard de différents produits à base de saumon.
+
+Ces classes sont issues du traitement statistique res.HCPC.3$desc.var, qui met en évidence les variables discriminantes et leur poids explicatif (v.test, p-value, moyennes).
+
+1. Description générale des variables discriminantes
+Les tests du χ² ont montré que plusieurs variables qualitatives sont significativement associées à la variable de cluster. Parmi elles, huit se distinguent particulièrement :
+
+Not.too.salty (p = 3,99×10⁻⁵),
+
+Appetising (p = 8,49×10⁻³),
+
+Firm.texture (p = 1,66×10⁻²),
+
+Characteristic.taste (p = 2,23×10⁻²),
+
+Wild (p = 2,92×10⁻²),
+
+Not.expensive (p = 3,19×10⁻²),
+
+Glossiness (p = 3,67×10⁻²),
+
+Healthy (p = 3,83×10⁻²).
+
+Ces p-values, toutes inférieures à 0,05, indiquent que ces variables contribuent de manière significative à la différenciation entre les groupes de consommateurs. Les axes de segmentation reposent donc à la fois sur la perception sensorielle (salinité, texture, goût), l’image du produit (naturel, sain, sauvage) et la valeur perçue (prix, aspect appétissant).
+
+2. Analyse détaillée des clusters
+
+**Cluster 1 : des consommateurs recherchant un saumon doux, naturel et accessible**
+Le premier groupe, majoritairement composé d’individus appréciant la douceur du saumon, se distingue nettement par des préférences pour un produit peu salé, à la texture lisse, perçu comme naturel et abordable.
+
+Sur le plan qualitatif, plusieurs catégories sont significativement surreprésentées :
+
+« Not too salty = Yes » (v.test = 3,10 ; p = 0,0019),
+
+« Firm texture = No » (v.test = 2,87 ; p = 0,004),
+
+« Glossiness = Yes » (v.test = 2,54 ; p = 0,011),
+
+« Wild = Yes » (v.test = 2,51 ; p = 0,012),
+
+« Smooth texture = Yes » (v.test = 2,28 ; p = 0,023),
+
+« Not expensive = Agree » (v.test = 2,17 ; p = 0,029).
+
+Ces résultats traduisent une préférence pour un saumon naturel et peu salé, dont l’apparence brillante est jugée fraîche et appétissante. Les consommateurs de ce cluster associent fréquemment le produit à une origine sauvage, gage de qualité et de naturalité, et le perçoivent comme économique. Ils privilégient également une texture souple et lisse, au détriment des chairs trop fermes.
+
+Les données quantitatives confirment cette tendance. Les produits prod25 (v.test = 9,76), prod16 (v.test = 9,51) et prod26 (v.test = 9,44) présentent des moyennes de satisfaction supérieures à la moyenne globale, traduisant un haut niveau d’appréciation pour ces profils. À l’inverse, prod10 (v.test = –12,80) et prod29 (v.test = –10,23) obtiennent des notes nettement inférieures, indiquant un rejet des produits perçus comme trop salés ou trop puissants.
+
+En somme, le premier cluster regroupe des consommateurs qui valorisent un saumon doux, lisse, peu salé et naturel, souvent associé à une consommation simple et abordable. Les p-values extrêmement faibles (< 0,01) et les v.test supérieurs à 9 confirment la stabilité statistique de ce profil.
+
+**Cluster 2 : des consommateurs distants, rationnels et peu impliqués**
+
+Le deuxième cluster se distingue par une attitude plus neutre et distante vis-à-vis du produit. Ces individus semblent peu enthousiasmés par le saumon, mais attentifs aux aspects pratiques et de sécurité alimentaire.
+
+Les variables qualitatives les plus discriminantes sont :
+« Appetising = No » (v.test = 3,06 ; p = 0,002),
+
+« Healthy = Neither » (v.test = 2,36 ; p = 0,019),
+
+« Use by date = Yes » (v.test = 2,32 ; p = 0,020),
+
+« Supermarket = Yes » (v.test = 2,00 ; p = 0,046).
+
+Ce groupe juge le saumon peu appétissant, et le considère ni sain ni malsain, traduisant un certain désintérêt gustatif. En revanche, ces consommateurs sont plus attentifs à la date limite de consommation et achètent majoritairement en supermarché, ce qui renvoie à un comportement de consommation rationnel et pratique.
+
+Les variables quantitatives associées appuient cette lecture :
+Les produits prod4 (v.test = 9,39 ; moyenne = 0,617) et prod27 (v.test = 9,09 ; moyenne = 0,538) sont les plus représentatifs de ce groupe, suggérant une préférence pour des textures plus fermes et structurées.
+
+À l’inverse, prod16 (v.test = –10,50) et prod18 (v.test = –5,87) sont nettement sous-notés, ce qui montre un rejet des saumons doux et délicats.
+Ce cluster correspond donc à des consommateurs pragmatiques, dont la relation au produit est fonctionnelle plutôt que émotionnelle. Ils consomment du saumon sans véritable enthousiasme, mais en respectant des critères de sécurité et de praticité (fraîcheur, date, achat courant). 
+Les v.test élevés (supérieurs à 9 pour certaines variables) et les p-values inférieures à 10⁻²⁰ traduisent une forte cohérence interne.
+
+**Cluster 3 : des amateurs de saumon salé, intense et perçu comme sain**
+
+Le troisième cluster regroupe des consommateurs qui valorisent au contraire un goût puissant et typique, une salinité marquée et une image positive du produit en termes de santé.
+
+Les catégories les plus caractéristiques sont :
+« Not too salty = No » (v.test = 4,44 ; p = 9,1×10⁻⁶),
+
+« Healthy = Completely agree » (v.test = 2,79 ; p = 0,005),
+
+« Characteristic taste = Yes » (v.test = 2,73 ; p = 0,006),
+
+« Crème fraîche = Yes » (v.test = 2,10 ; p = 0,036).
+
+Ces consommateurs recherchent un goût prononcé, typé et salé, qu’ils associent à une expérience culinaire complète (souvent accompagnée de crème fraîche). Ils considèrent également le saumon comme un aliment sain, ce qui renforce une image de plaisir équilibré.
+
+Les données quantitatives corroborent cette interprétation :
+
+- prod10 (v.test = 10,83), prod29 (v.test = 10,67) et prod20 (v.test = 10,24) présentent des moyennes nettement supérieures à la moyenne globale, confirmant une préférence forte pour les produits intenses et salés.
+
+- À l’inverse, les produits prod21 (v.test = –5,55) et prod25 (v.test = –8,13) sont rejetés, car jugés trop doux ou fades.
+
+Les valeurs statistiques extrêmement significatives (p < 10⁻²⁵) indiquent que ce profil est très bien différencié des autres.
+
+Ces consommateurs représentent une cible “gourmet santé” : ils recherchent un saumon goûteux, typique, salé, tout en conservant l’idée d’un produit sain et de qualité.
+
