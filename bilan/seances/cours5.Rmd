@@ -34,7 +34,6 @@ Cette variable latente représente l’idée que les données proviennent d’un
 Ainsi, le modèle repose sur deux éléments essentiels :
 
 1. **la probabilité d’appartenir à chaque classe**, définie par les poids du mélange ;
-
 2. **la distribution des observations conditionnellement à cette classe**, ici modélisée par une loi gaussienne.
 
 ---
@@ -46,8 +45,7 @@ On introduit une variable latente \(Z\), souvent représentée comme un vecteur 
 - \(Z_k = 1\) signifie que l’individu appartient à la classe \(k\),
 - \(Z_k = 0\) signifie qu’il n’y appartient pas.
 
-Une seule composante est égale à 1, les autres valent 0 :  
-l’individu appartient **exactement à une seule classe**.
+Une seule composante est égale à 1, les autres valent 0 : l’individu appartient **exactement à une seule classe**.
 
 La variable \(Z\) suit donc une **loi multinomiale à un seul tirage**, paramétrée par les poids \(\pi_k\).  
 Les \(\pi_k\) représentent les proportions de chaque classe dans la population :
@@ -239,5 +237,195 @@ $$
 
 ---
 
-## TD : 
+## Application : classification de données fonctionnelles
 
+On s’intéresse ici à la classification de **données fonctionnelles** :  
+chaque individu correspond à une **courbe mesurée dans le temps**.
+
+- Chaque ligne représente un spectre ou un signal.  
+- Chaque colonne correspond à une mesure de ce signal à un instant donné.  
+- Toutes les courbes sont mesurées avec le **même pas de temps**.
+
+L’objectif est de **classifier ces fonctions** en identifiant des formes ou profils similaires parmi les courbes.
+
+---
+
+## 1. Visualisation des courbes
+
+La première étape consiste à **représenter graphiquement l’ensemble des courbes** pour visualiser la variabilité globale, repérer d’éventuels groupes naturels et identifier des ruptures de tendance.
+
+```{r,message=FALSE, warning=FALSE}
+library(tidyverse)
+
+#Importation des données
+df <- read.table("data2.csv",header=TRUE,sep=";",dec=".")
+
+#Conversion des colonnes en numériques 
+df[,1:101] <- lapply(df[,1:101],as.numeric)
+
+#Représentation des courbes
+matrice_y <- as.matrix(df[,-1]) #on retire la première colonne
+t_signal <- t(matrice_y)
+
+
+seq_t <- seq(1,100,1)
+
+matplot(seq_t,t_signal,type="l",lwd=0.1,col="blue",lty=1,
+        xlab= "Temps", ylab ="Intensité")
+grid()
+```
+
+
+## 2. Tentative de classification directe par k-means
+
+Une première idée naturelle est d’appliquer un k-means directement sur les données brutes, en considérant chaque courbe comme un point dans un espace de grande dimension (ici, ~100 dimensions).
+
+Cependant, cette approche fonctionne en général mal pour les données fonctionnelles :
+
+- Les courbes sont très corrélées dans le temps → forte redondance de l’information.
+
+- Le k-means utilise une distance euclidienne standard, peu adaptée à des objets « courbes ».
+
+- Le bruit local ou de petites oscillations peuvent dominer la distance, alors que l’on souhaite capturer plutôt la forme globale (croissance, décroissance, plateau, etc.).
+
+```{r, message=FALSE, warning=FALSE}
+#k-means sur les données brutes
+
+set.seed(123)
+res_kmeans <- kmeans(scale(df[,-1]),centers = 3)
+cluster_kmeans <- res_kmeans$cluster
+
+df_kmeans <- df %>% mutate(cluster = cluster_kmeans)
+
+dt_long <- df_kmeans %>% pivot_longer(cols = starts_with("V"),
+                                      names_to = "temps",
+                                      values_to = "intensite")
+
+dt_long$temps <- as.numeric(sub("V", "", dt_long$temps))
+
+# Visualisation des spectres par cluster k-means
+ggplot(dt_long, aes(x = temps, y = intensite, group = X)) +
+geom_line(alpha = 0.8, linewidth = 0.6) +
+facet_wrap(~ cluster, scales = "free_y") +
+labs(
+title = "Spectres des échantillons par cluster (k-means sur données brutes)",
+x = "Temps",
+y = "Intensité"
+) +
+theme_minimal() +
+theme(legend.position = "none")
+```
+
+On observe que les clusters obtenus sont peu interprétables et ne correspondent pas vraiment aux différence de formes des couches. De plus, entre nous nos 3 clusters n'étaient jamais similaires.
+
+## 3. Identification de points d'inflexion et modélisation pièce par pièce
+
+En observant les courbes, on remarque que leur structure change à deux instants caractéristiques : 
+
+- 1/3 du temps
+- 2/3 du temps 
+
+Ces points correspondent à des inflexions (changement de tendance : croissance, décroissance). C'est pour cela que nous allons faire une modélisation segment par segment. 
+
+L'idée est de résumer chaque segment par un coefficient directeur obtenu via une régression linéaire. 
+
+```{r}
+# Séparation des données en 3 segments : 1/3, 2/3 et fin
+# (ici colonnes 2:34, 35:67, 68:101 à adapter à la structure réelle)
+
+data_1 <- df[, 2:34]    # segment 1 (33 points)
+data_2 <- df[, 35:67]   # segment 2 (33 points)
+data_3 <- df[, 68:101]  # segment 3 (34 points)
+
+# Séquences de temps pour chaque segment
+
+seq_1 <- 1:ncol(data_1)   # 1 à 33
+seq_2 <- 1:ncol(data_2)   # 1 à 33
+seq_3 <- 1:ncol(data_3)   # 1 à 34
+
+# Vecteurs pour stocker les coefficients directeurs
+
+n_ind <- nrow(df_kmeans)
+coef_1 <- rep(NA, n_ind)
+coef_2 <- rep(NA, n_ind)
+coef_3 <- rep(NA, n_ind)
+
+# Boucle des régressions linéaires (lm) pour chaque individu et chaque segment
+
+for (i in 1:n_ind) {
+
+# Segment 1
+
+m1 <- lm(as.numeric(data_1[i, ]) ~ seq_1)
+coef_1[i] <- coef(m1)[2]
+
+# Segment 2
+
+m2 <- lm(as.numeric(data_2[i, ]) ~ seq_2)
+coef_2[i] <- coef(m2)[2]
+
+# Segment 3
+
+m3 <- lm(as.numeric(data_3[i, ]) ~ seq_3)
+coef_3[i] <- coef(m3)[2]
+}
+
+# Matrice finale de features (150 x 3 ici)
+extraction_features <- as.data.frame(cbind(coef_1, coef_2, coef_3))
+colnames(extraction_features) <- c("pente_seg1", "pente_seg2", "pente_seg3")
+
+summary(extraction_features)
+```
+
+On obtient ainsi une matrice 150 x 3 qui résume chaque courbe par trois nombres représentant les tendances locales. 
+
+## 4.classification finale des courbes par modèle de mélange gaussien
+
+Une fois ces paramètres extraits, on peut appliquer une méthode de clustering adapté : mclust(), un modèle de mélange gaussien.
+
+```{r, message=FALSE, warning=FALSE}
+library(mclust)
+
+# Modèle de mélange gaussien sur les 3 features
+
+modele_mclust <- Mclust(extraction_features, G = 3)
+summary(modele_mclust)
+
+# Classement final des courbes
+clusters_mclust <- modele_mclust$classification
+extraction_features$cluster_mclust <- as.factor(clusters_mclust)
+
+# On rattache les clusters mclust aux courbes d'origine
+df_kmeans$cluster_mclust <- as.factor(clusters_mclust)
+
+# Visualisation des courbes par cluster mclust
+dt_long_mclust <- df_kmeans %>%
+select(-cluster) %>%        # on peut enlever l'ancien cluster k-means
+pivot_longer(
+cols = starts_with("V"),
+names_to = "temps",
+values_to = "intensite"
+)
+
+dt_long_mclust$temps <- as.numeric(sub("V", "", dt_long_mclust$temps))
+
+ggplot(dt_long_mclust, aes(x = temps, y = intensite, group = X)) +
+geom_line(alpha = 0.8, linewidth = 0.6) +
+facet_wrap(~ cluster_mclust, scales = "free_y") +
+labs(
+title = "Spectres des échantillons par cluster (modèle de mélange gaussien)",
+x = "Temps",
+y = "Intensité"
+) +
+theme_minimal() +
+theme(legend.position = "none")
+
+```
+
+On obtient ainsi une classification des courbes basée sur leurs profils fonctionnels (pentes des segments), qui est beaucoup mieux interprétables qu'un k-means appliqué directement sur les données brutes.
+
+Le premier cluster a une pente positive sur le premier segment puis une transition vers une pente plus faible ou nulle et une intensité élevée en fin de signal. 
+
+Le second cluster a une pente positive dans les trois segments tout ayant une amplitude plus faible que le cluster 1. 
+
+Le cluster 3 a une première pente légèrement négative ou stable, une forte pente négatuve ensuite et une remontée très forte dans le dernier segment.
