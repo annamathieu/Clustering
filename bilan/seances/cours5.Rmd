@@ -1,0 +1,243 @@
+---
+title: "Bilan de la séance 5 : Variables latentes et variables cachées"
+date: "`r Sys.Date()`"
+output: html_document
+---
+## Introduction
+
+Dans les modèles à variables latentes, on suppose que chaque observation \(X_i\) provient d’une **classe cachée** (ou variable latente) notée \(Z_i\).
+
+On considère que :
+
+$$
+Z_i \sim \text{Multinomial}(\pi_1, \ldots, \pi_K)
+$$
+
+où :
+
+- \(K\) est le nombre de classes (ou composantes du mélange),
+- \(\pi_k\) est la probabilité d’appartenir à la classe \(k\), avec :
+
+$$
+\sum_{k=1}^K \pi_k = 1
+$$
+
+- \(Z_{ik} = 1\) si l'individu \(i\) appartient à la classe \(k\), sinon \(Z_{ik} = 0\).
+
+---
+
+## Étape 1 : Modélisation probabiliste
+
+L’objectif de cette première étape est de **décrire le mécanisme probabiliste** qui permet de générer les observations lorsque l’on suppose l’existence d’une **variable latente** indiquant l’appartenance de chaque individu à une classe cachée.  
+Cette variable latente représente l’idée que les données proviennent d’un **mélange de plusieurs sous-populations**, chacune ayant ses propres caractéristiques statistiques.
+
+Ainsi, le modèle repose sur deux éléments essentiels :
+
+1. **la probabilité d’appartenir à chaque classe**, définie par les poids du mélange ;
+
+2. **la distribution des observations conditionnellement à cette classe**, ici modélisée par une loi gaussienne.
+
+---
+
+### Distribution de la variable latente
+
+On introduit une variable latente \(Z\), souvent représentée comme un vecteur binaire \((Z_1, \ldots, Z_K)\), où :
+
+- \(Z_k = 1\) signifie que l’individu appartient à la classe \(k\),
+- \(Z_k = 0\) signifie qu’il n’y appartient pas.
+
+Une seule composante est égale à 1, les autres valent 0 :  
+l’individu appartient **exactement à une seule classe**.
+
+La variable \(Z\) suit donc une **loi multinomiale à un seul tirage**, paramétrée par les poids \(\pi_k\).  
+Les \(\pi_k\) représentent les proportions de chaque classe dans la population :
+
+$$
+p(z) = \prod_{k=1}^{K} \pi_k^{z_k}
+$$
+
+Cette écriture compacte traduit le fait que :
+
+- si \(z_k = 1\), on récupère \(\pi_k\),
+
+- sinon, \(\pi_k^{0} = 1\) et n’influence pas la probabilité.
+
+Ainsi, la distribution de \(Z\) modélise **la structure invisible** qui génère les données.
+
+---
+
+### Distribution conditionnelle : comment générer une observation \(x\) ?
+
+Une fois la classe latente déterminée, l’observation \(x\) est générée selon une distribution propre à cette classe.
+
+On suppose que chaque classe \(k\) suit une loi normale multivariée :
+
+- moyenne \(\mu_k\),
+- matrice de covariance \(\Sigma_k\).
+
+Autrement dit :
+
+$$
+p(x \mid z_k = 1) = \mathcal{N}(x \mid \mu_k, \Sigma_k)
+$$
+
+Si l’on considère l’expression en fonction du vecteur \(z\), on peut écrire :
+
+$$
+p(x \mid z) 
+= 
+\prod_{k=1}^K 
+\mathcal{N}(x \mid \mu_k, \Sigma_k)^{z_k}
+$$
+
+Cette forme s’interprète exactement comme pour \(p(z)\) :
+
+- seule la gaussienne correspondant à la classe active (\(z_k = 1\)) intervient,
+- les autres termes, élevés à la puissance 0, disparaissent.
+
+---
+
+### Distribution marginale de \(x\) : le mélange gaussien
+
+Comme la variable latente n’est pas observée, on s’intéresse à la probabilité marginale d’obtenir \(x\).  
+On somme donc sur toutes les configurations possibles de \(z\).  
+Cela conduit naturellement au modèle de **mélange de gaussiennes** :
+
+$$
+p(x) 
+= 
+\sum_{z} p(z) \, p(x \mid z)
+= 
+\sum_{k=1}^K \pi_k \, \mathcal{N}(x \mid \mu_k, \Sigma_k)
+$$
+
+Cette expression montre que la distribution globale des données est une **combinaison pondérée** des distributions de chaque classe.
+
+- Les **\(\pi_k\)** pondèrent l’importance relative de chaque composante.  
+- Les **gaussiennes** \(\mathcal{N}(x \mid \mu_k, \Sigma_k)\) décrivent les profils propres aux sous-populations.
+
+C’est ce modèle qui sera estimé par l’algorithme EM dans les étapes suivantes.
+
+---
+
+
+## Étape 2 : Expectation (E-step)
+
+L’objectif de l’étape E est de calculer, pour chaque observation \(x\), la **probabilité a posteriori** qu’elle appartienne à chacune des \(K\) composantes du mélange.
+
+On note :
+
+$$
+\gamma(z_k) = p(z_k = 1 \mid x)
+$$
+
+Cela représente la probabilité pour que l’individu \(x\) appartienne à la classe \(k\).
+
+### Application du théorème de Bayes
+
+Comme \(Z_k\) indique l’appartenance à la classe \(k\), on applique le théorème de Bayes :
+
+$$
+p(z_k = 1 \mid x)
+=
+\frac{
+p(x \mid z_k = 1) \, p(z_k = 1)
+}{
+\sum_{j=1}^K p(x \mid z_j = 1) \, p(z_j = 1)
+}
+$$
+
+Dans un modèle de mélange gaussien, on a :
+
+- \(p(z_k = 1) = \pi_k\), le poids de la composante \(k\),
+- \(p(x \mid z_k = 1) = \mathcal{N}(x \mid \mu_k, \Sigma_k)\), la gaussienne associée à la classe \(k\).
+
+On obtient alors :
+
+$$
+\gamma(z_k)
+=
+p(z_k = 1 \mid x)
+=
+\frac{
+\pi_k \, \mathcal{N}(x \mid \mu_k, \Sigma_k)
+}{
+\sum_{j=1}^K \pi_j \, \mathcal{N}(x \mid \mu_j, \Sigma_j)
+}
+$$
+
+Cette étape correspond à l’**étiquetage probabiliste** :
+
+- si \(\gamma(z_k)\) est proche de 1 → l’observation appartient presque sûrement à la classe \(k\),
+- si les \(\gamma(z_k)\) sont proches pour plusieurs \(k\) → l’observation est « entre » différentes classes.
+
+---
+
+## Étape 3 : Maximisation (M-step) — mise à jour des paramètres
+
+L’objectif de l’étape M est de maximiser la **log-vraisemblance** du modèle en utilisant les \(\gamma(z_{ik})\) calculées à l’étape E.  
+On met à jour les paramètres du mélange gaussien : \(\pi_k, \mu_k, \Sigma_k\).
+
+### Log-vraisemblance
+
+La log-vraisemblance s’écrit :
+
+$$
+\ln p(\mathbf{X} \mid \boldsymbol{\pi}, \boldsymbol{\mu}, \boldsymbol{\Sigma})
+=
+\sum_{i=1}^{n} 
+\ln \left\{
+\sum_{k=1}^{K} 
+\pi_k \, \mathcal{N}(X_i \mid \mu_k, \Sigma_k)
+\right\}
+$$
+
+### Définition du nombre effectif d’observations par classe
+
+On définit :
+
+$$
+N_k = \sum_{i=1}^n \gamma(z_{ik})
+$$
+
+Cela correspond au **nombre effectif** d’observations assignées à la classe \(k\).
+
+### Mise à jour des moyennes \(\mu_k\)
+
+La nouvelle moyenne estimée de chaque composante est :
+
+$$
+\mu_k^{\text{new}} =
+\frac{
+\sum_{i=1}^n \gamma(z_{ik}) \, x_i
+}{
+N_k
+}
+$$
+
+### Mise à jour des matrices de covariance \(\Sigma_k\)
+
+La nouvelle matrice de covariance de la classe \(k\) s’écrit :
+
+$$
+\Sigma_k^{\text{new}} =
+\frac{
+\sum_{i=1}^n \gamma(z_{ik}) (x_i - \mu_k^{\text{new}})(x_i - \mu_k^{\text{new}})^{T}
+}{
+N_k
+}
+$$
+
+### Mise à jour des poids \(\pi_k\)
+
+Comme les poids doivent vérifier \(\sum_{k=1}^K \pi_k = 1\), on maximise la log-vraisemblance sous contrainte à l’aide d’un Lagrangien.  
+En dérivant par rapport à \(\pi_k\), on obtient :
+
+$$
+\pi_k^{\text{new}} = \frac{N_k}{n}
+$$
+
+---
+
+## TD : 
+
