@@ -1,0 +1,29 @@
+---
+title: "Classification Non Supevisée , cours 1"
+author: "Anna Mathieu"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+Qu’est-ce que la classification non supervisée ?
+
+La classification non supervisée est une méthode d’analyse qui vise à regrouper des objets (individus, produits, observations, etc.) en classes homogènes, sans connaître à l’avance ces classes.
+Contrairement à la classification supervisée, il n’y a pas de variable à prédire : on cherche simplement à découvrir des structures cachées dans les données.
+
+Pourquoi faire de la classification ?
+
+L’objectif est de réduire la complexité d’un jeu de données en mettant en évidence des structures internes :
+On simplifie la lecture et l’interprétation.
+On identifie des groupes d’objets similaires.
+
+On retrouve une logique proche de l’analyse factorielle, qui réduit la dimension, mais ici on réduit la diversité des profils
+Pour classer, il faut pouvoir mesurer la proximité entre objets : c’est le rôle de la distance métrique (euclidienne, Manhattan, etc.).
+
+« Qui dit distance métrique dit contrainte spatiale » Autrement dit, chaque individu est un point dans un espace à plusieurs dimensions et la distance traduit sa ressemblance avec un autre point.
+
+Matrice des distances
+
+La matrice des distances est le point de départ de toute classification. C’est une matrice carrée de taille n × n  qui contient toutes les distances entre paires d’objets.
+
+Critères d’agrégation
+En classification hiérarchique, on utilise un critère d’agrégation pour décider comment fusionner les groupes.
