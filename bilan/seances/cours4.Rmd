@@ -3,15 +3,110 @@ title: "seance 4"
 author: "Anna Mathieu"
 date: "`r Sys.Date()`"
 output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ## Génération de données
 
-On s'intéresse aux processus génératif de données et aux lois de mélange de gaussiennes bidimensionnelles. Connaissant l'allure des données (histogramme des deux gaussiennes mélangées), on cherche à définir une solution d'initialisation de l'algorithme et d'alterner entre étapes d'expectation (calcul des probabilités d'appartenance de chaque point donné à l'une et l'autre gaussienne), et de maximisation (calcul à partir des probabilités d'appartenance à chaque gaussienne, des paramètres mis-à-jour des gaussiennes : µ et sigma), puis calcul des probabilités d'appartenance à chaque gaussienne avec paramètres mis à jour, et ré-estimation des paramètres des gaussiennes par pondération des probabilités d'appartenance de chaque point, jusqu'à convergence de l'algorithme (par rapport à un critère d'arrêt défini).
+### Algorithme EM
 
-On commence par générer des un vecteur de données de taille 1 x 500 pour un autre groupe. Ce vecteur est généré à partir d'un mélange en proportions que l'on choisit de valeurs issues de deux lois normales de paramètres (mu, sigma) que l'on choisit.
+L’algorithme EM est une méthode d’optimisation itérative utilisée pour
+estimer les paramètres d’un modèle statistique lorsque certaines
+variables sont inobservées. Il est particulièrement utile pour les lois
+de mélanges, où chaque observation peut appartenir à plusieurs classes
+avec une certaine probabilités d’appartenance.
 
-On va créer une fonction pour générer automatiquement ce vecteur de taille 1x500 à partir des paramètres mu1, mu2 (moyennes des gaussiennes 1 et 2), sigma1, sigma2 (écarts types des gaussiennes 1 et 2), n1 et n2 (nombre de valeurs de la gaussienne 1 générées, resp. 2)
+L’idée est d’alterner deux étapes :
+
+1.  E (Expectation) : estimer les probabilités d’appartenance des
+    données aux différentes classes, connaissant les paramètres actuels.
+
+2.  M (Maximization) : mettre à jour les paramètres du modèles
+    (moyennes, variances, poids, etc…) en utilisant les estimations
+    obtenues à l’étape E.
+
+Ces deux étapes sont répétées jusqu’à convergence, c’est-à-dire jusqu’à
+ce que les paramètres du modèle ne changent presque plus.
+
+Déroulement de l’algorithme Initialisation : on part d’une distribution
+de valeurs observées. Les paramètres initiaux (moyennes, variances,
+poids des classes) sont choisis aléatoirement.
+
+Etape E (Etiquetage) : connaissant les paramètres actuels (θ), on
+calcule, pour chaque observation, la probabilité d’appartenir à chaque
+classe. Autrement dit, on estime la proportion attendue d’individus
+appartenant à chaque classe. Ces probabilités servant à “étiqueter” les
+données de manière non stricte : une même observation peut appartenir
+partiellement à plusieurs classes.
+
+Etape M (Maximisation des paramètres) : connaissant les probabilités
+d’appartenance calculées à l’étape précédente, on met à jour les
+paramètres θ du modèle (moyennes, écart-types)
+
+Dans une loi de mélange, il n’y a pas d’appartenance stricte à une
+classe : chaque observation possède une probabilité d’appartenance à
+chacune des composantes du mélange. Les mises à jour des paramètres se
+font donc sous forme de moyennes pondérées par ces probabilités.
+
+Étapes concrètes de génération d’un modèle de mélange : Générer un
+vecteur aléatoire représentant les observations Observer la distribution
+de ce vecteur Calculer les probabilités d’appartenance à chaque classe à
+partir des moyennes initiales Mettre à jour les moyennes des classes
+Répéter les étapes E et M jusqu’à stabilisation des résultats
+
+### Exemple de l'algorithme EM sur proba de dé
+
+Considérons un dé à 4 faces dont les probabilités dépendent d’un
+paramètre inconnu θ\
+- P(1) = ½,
+
+\- P(2) = θ ,
+
+\- P3 = 2θ et
+
+\- P4 = ½ -3θ
+
+Et x = nombre de 1 et de 2, α3 = nombre de 3, α4 = nombre de 4
+
+On note : x =α1 + α2 et $$\frac{α1}{α2}= \frac{1}{2θ}$$
+
+Ainsi, on retrouve : $$α1 = \frac{x}{2θ + 1}$$ et
+$$α2 = \frac{2θx}{2θ + 1}$$
+
+On a x = 20, α3​ = 10 et α4​ = 10
+
+Initialisation θ(0) = 0, Etape E : α1 = 20 et α2 = 0 Etape M : θ(1) =
+1/12
+
+Puis on recalcule α1 et α2 avec la nouvelle valeur de θ, puis on calcule
+θ et ainsi de suite jusqu’à convergence.
+
+### Processus génératif de données et aux lois de mélange de gaussiennes bidimensionnelles
+
+On s'intéresse aux processus génératif de données et aux lois de mélange
+de gaussiennes bidimensionnelles. Connaissant l'allure des données
+(histogramme des deux gaussiennes mélangées), on cherche à définir une
+solution d'initialisation de l'algorithme et d'alterner entre étapes
+d'expectation (calcul des probabilités d'appartenance de chaque point
+donné à l'une et l'autre gaussienne), et de maximisation (calcul à
+partir des probabilités d'appartenance à chaque gaussienne, des
+paramètres mis-à-jour des gaussiennes : µ et sigma), puis calcul des
+probabilités d'appartenance à chaque gaussienne avec paramètres mis à
+jour, et ré-estimation des paramètres des gaussiennes par pondération
+des probabilités d'appartenance de chaque point, jusqu'à convergence de
+l'algorithme (par rapport à un critère d'arrêt défini).
+
+On commence par générer des un vecteur de données de taille 1 x 500 pour
+un autre groupe. Ce vecteur est généré à partir d'un mélange en
+proportions que l'on choisit de valeurs issues de deux lois normales de
+paramètres (mu, sigma) que l'on choisit.
+
+On va créer une fonction pour générer automatiquement ce vecteur de
+taille 1x500 à partir des paramètres mu1, mu2 (moyennes des gaussiennes
+1 et 2), sigma1, sigma2 (écarts types des gaussiennes 1 et 2), n1 et n2
+(nombre de valeurs de la gaussienne 1 générées, resp. 2)
 
 ```{r}
 # Fonction permettant de générer des données 
@@ -32,9 +127,10 @@ res
 write.csv(res, 'res.csv')
 ```
 
-## Chargement des données reçues du groupe 4
+#### Chargement des données reçues du groupe 4
 
-On reçoit d'un autre groupe de la classe un vecteur de taille 1x500, similairement généré par mélange de deux gaussiennes.
+On reçoit d'un autre groupe de la classe un vecteur de taille 1x500,
+similairement généré par mélange de deux gaussiennes.
 
 ```{r}
 # Visualisation des données du vecteur 
@@ -46,25 +142,46 @@ vec <- sapply(vec, as.numeric)
 hist(vec, nclass = 50, freq = F)
 ```
 
-# Initialisation de l'algorithme
+#### Initialisation de l'algorithme
 
-On choisit des vecteurs de paramètres permettant d'initialiser l'algorithme. On choisit $N(14,5)$ et $N(26,10)$.
+On choisit des vecteurs de paramètres permettant d'initialiser
+l'algorithme. On choisit $N(14,5)$ et $N(26,10)$.
 
-On va calculer en 3 points $x_1 = 12$ , $x_2 = 20$ , $x_3 = 26$ , la valeur de la fonction de densité des lois gaussiennes, d'une part avec les paramètres 1, d'autre part avec les paramètres 2.
+On va calculer en 3 points $x_1 = 12$ , $x_2 = 20$ , $x_3 = 26$ , la
+valeur de la fonction de densité des lois gaussiennes, d'une part avec
+les paramètres 1, d'autre part avec les paramètres 2.
 
 La formule de la densité d'une gaussienne est :
 
-$f(x) = \frac{1}{\sigma \ * \  \sqrt(2 \ * \pi)} * \exp (- \frac{1}{2}(\frac{x - \mu}{\sigma}) )\ $
+$f(x) = \frac{1}{\sigma \ * \  \sqrt(2 \ * \pi)} * \exp (- \frac{1}{2}(\frac{x - \mu}{\sigma}) )\$
 
-Cette fonction appelée fonction de répartition de la loi gaussienne modélise l'histogramme cumulatif d'une distribution en cloche.
+Cette fonction appelée fonction de répartition de la loi gaussienne
+modélise l'histogramme cumulatif d'une distribution en cloche.
 
-Elle donne en chaque point donné x ; $x \in (-\infty \  ; \ +\infty)$) la valeur de f(x) correspondante. On sait que par définition la probabilité qu'un x soit compris entre a \<= x \<= b correspond à la dérivée de f(x) (f'(x)) de a à b, c'est-à-dire l'aire sous la courbe de f de a à b.
+Elle donne en chaque point donné x ; $x \in (-\infty \  ; \ +\infty)$)
+la valeur de f(x) correspondante. On sait que par définition la
+probabilité qu'un x soit compris entre a \<= x \<= b correspond à la
+dérivée de f(x) (f'(x)) de a à b, c'est-à-dire l'aire sous la courbe de
+f de a à b.
 
-On commence par calculer en trois points, définis plus hauts, la densité de la fonction en chacun de ces points, s'ils appartenaient à la gaussienne 1 et s'ils appartenaient à la gaussienne 2. On fixe en effet la classe comme s'il s'agissait de la classe réelle. Plus la densité est élevée, plus le point sera proche du 'pic' de la gaussienne (donc de sa moyenne), donc plus la probabilité que ce point appartienne à cette gaussienne sera élévée, car observée cette valeur de x sous l'hypothèse nulle sera très probable. Au contraire, si la densité est très faible, alors la probabilité qu'un tel x appartenant à cette distribution ait été observé sous l'hypothèse nul est très faible.
+On commence par calculer en trois points, définis plus hauts, la densité
+de la fonction en chacun de ces points, s'ils appartenaient à la
+gaussienne 1 et s'ils appartenaient à la gaussienne 2. On fixe en effet
+la classe comme s'il s'agissait de la classe réelle. Plus la densité est
+élevée, plus le point sera proche du 'pic' de la gaussienne (donc de sa
+moyenne), donc plus la probabilité que ce point appartienne à cette
+gaussienne sera élévée, car observée cette valeur de x sous l'hypothèse
+nulle sera très probable. Au contraire, si la densité est très faible,
+alors la probabilité qu'un tel x appartenant à cette distribution ait
+été observé sous l'hypothèse nul est très faible.
 
-Si le rapport des densités d1/d2 pour un x donné est supérieur à 1, alors il est plus probable que le point x appartienne à la gaussienne 1 qu'à la gaussienne 2 (et respectivement à la gaussienne 2 si d1/d2 est inféieur à 1).
+Si le rapport des densités d1/d2 pour un x donné est supérieur à 1,
+alors il est plus probable que le point x appartienne à la gaussienne 1
+qu'à la gaussienne 2 (et respectivement à la gaussienne 2 si d1/d2 est
+inféieur à 1).
 
-On définit une fonction qui calcule la densité de x selon les paramètres $\mu \ ; \ \sigma$ de la gaussienne.
+On définit une fonction qui calcule la densité de x selon les paramètres
+$\mu \ ; \ \sigma$ de la gaussienne.
 
 ```{r}
 densite <- function(sigma, mu, x) {
@@ -83,7 +200,8 @@ s1.1 <- 5
 s2.1 <- 10
 ```
 
-On calcule pour chacun des trois points choisis la densité de f(x) selon les vecteurs de paramètres d'initialisation choisis.
+On calcule pour chacun des trois points choisis la densité de f(x) selon
+les vecteurs de paramètres d'initialisation choisis.
 
 ```{r}
 # Pour x = 12
@@ -102,46 +220,73 @@ d.2.25 <- densite(sigma = s2.1, mu = mu2.1, x = 25)
 d.1.25/d.2.25 # < 1
 ```
 
-Le point proche du pic de la gaussienne 1 ainsi que le point au milieu entre les deux pics des deux gaussiennes sont plus probables d'appartenir à la distribution de la gaussienne 1. Le point proche du pic de la gaussienne 2 appartient plus probablement à la gaussienne 2.
+Le point proche du pic de la gaussienne 1 ainsi que le point au milieu
+entre les deux pics des deux gaussiennes sont plus probables
+d'appartenir à la distribution de la gaussienne 1. Le point proche du
+pic de la gaussienne 2 appartient plus probablement à la gaussienne 2.
 
-Or, on ne connait pas les paramètres réels des deux gaussiennes, on veut les estimer.
+Or, on ne connait pas les paramètres réels des deux gaussiennes, on veut
+les estimer.
 
-On va donc étendre à tout le vecteur de valeur l'étape E, permettant d'associer chaque valeur du vecteur avec une probabilité d'appartenir à la distribution 1 et respectivement à la distribution 2. On va ensuite appliquer une étape de l'algorithme M, permettant à partir des moyennes pondérées de recalculer une meilleure estimation des vecteurs de paramètres des gaussiennes 1 et 2, puis répéter ces deux opérations jusqu'à convergence de l'algorithme.
+On va donc étendre à tout le vecteur de valeur l'étape E, permettant
+d'associer chaque valeur du vecteur avec une probabilité d'appartenir à
+la distribution 1 et respectivement à la distribution 2. On va ensuite
+appliquer une étape de l'algorithme M, permettant à partir des moyennes
+pondérées de recalculer une meilleure estimation des vecteurs de
+paramètres des gaussiennes 1 et 2, puis répéter ces deux opérations
+jusqu'à convergence de l'algorithme.
 
-## Etape E
+#### Etape E
 
-L'objectif de l'étape E est d'étiquetter chacune des valeurs du vecteur *res* avec une probabilité d'appartenance à chacune des gaussiennes associé à son vecteur de paramètre initialisé.
+L'objectif de l'étape E est d'étiquetter chacune des valeurs du vecteur
+*res* avec une probabilité d'appartenance à chacune des gaussiennes
+associé à son vecteur de paramètre initialisé.
 
-On va calculer en chaque point du vecteur, et donc en chaque x, la densité de la fonction si le point x appartient à la gaussienne 1, et idem si le point x appartient à la gaussienne 2. De cette façon, on fixe l'appartenance de x à chacune des deux gaussiennes, donc calculer cette densité revient à calculer : 
+On va calculer en chaque point du vecteur, et donc en chaque x, la
+densité de la fonction si le point x appartient à la gaussienne 1, et
+idem si le point x appartient à la gaussienne 2. De cette façon, on fixe
+l'appartenance de x à chacune des deux gaussiennes, donc calculer cette
+densité revient à calculer :
 
-- P(A|C1) : la probabilité pour que un individu qui appartient à la classe 1 soit classé comme appartenant à la classe 1 
-- et resp. P(A|C2) : la probabilité qu'un individu de la classe 2 soit classé comme appartenant à la classe 2 (bien classé)
+-   P(A\|C1) : la probabilité pour que un individu qui appartient à la
+    classe 1 soit classé comme appartenant à la classe 1
+-   et resp. P(A\|C2) : la probabilité qu'un individu de la classe 2
+    soit classé comme appartenant à la classe 2 (bien classé)
 
-A partir de tous les calculs de densité d1 et d2, en chaque point du vecteur, on peut calculer pour chaque point s'il est plus probable qu'il appartienne à la gaussienne 1 ou à la gausienne 2. Ainsi, sur l'ensemble des 500 valeurs du vecteur *res* , on peut calculer la probabilité à posteriori d'appartenir à la classe 1 (gaussienne 1) ou à la classe 2 (gausseinne 2). 
+A partir de tous les calculs de densité d1 et d2, en chaque point du
+vecteur, on peut calculer pour chaque point s'il est plus probable qu'il
+appartienne à la gaussienne 1 ou à la gausienne 2. Ainsi, sur l'ensemble
+des 500 valeurs du vecteur *res* , on peut calculer la probabilité à
+posteriori d'appartenir à la classe 1 (gaussienne 1) ou à la classe 2
+(gausseinne 2).
 
-P(C1) : probabilité d'appartenir à la classe 1
-P(C2) : probabilité d'appartenir à la classe 2 
+P(C1) : probabilité d'appartenir à la classe 1 P(C2) : probabilité
+d'appartenir à la classe 2
 
-En réalité, ces probabilités sont connues par la loi de génération des données : 
-$P(C1) = \frac {n1}{n1 \ + \ n2} $ 
+En réalité, ces probabilités sont connues par la loi de génération des
+données : \$P(C1) = \frac {n1}{n1 \ + \ n2} \$
 
-Or nous ne connaissons pas n1 et n2. Ainsi, nous estimons P(C1) et P(C2) à partir du nombre de valeurs du vecteur de données pour lequel $\frac{d1}{d2} > 1$ . La somme de ces valeurs correspond à P(C1).
+Or nous ne connaissons pas n1 et n2. Ainsi, nous estimons P(C1) et P(C2)
+à partir du nombre de valeurs du vecteur de données pour lequel
+$\frac{d1}{d2} > 1$ . La somme de ces valeurs correspond à P(C1).
 
-Par la formule de bayes, on sait que : 
+Par la formule de bayes, on sait que :
 
-$P(C_1|A) = \frac{P(A|C_1) \ * \ P(C_1)}{\sum_K \  P(A|C_K) \ * \ P(C_K)} $
+\$P(C_1\|A) =
+\frac{P(A|C_1) \ * \ P(C_1)}{\sum_K \  P(A|C_K) \ * \ P(C_K)} \$
 
-soit : 
+soit :
 
-$P(C_1|A) = \frac{P(A|C_1) \ * \ P(C_1)} {P(A|C_1) \ * \ P(C_1) \ + \ P(A|C_2) \ * \ P(C_2) }   $
- 
- 
-avec : 
+\$P(C_1\|A) = \frac{P(A|C_1) \ * \ P(C_1)} {P(A\|C_1)  \*  P(C_1)  +
+ P(A\|C_2)  \*  P(C_2) } \$
 
-- $P(C_1|A)$ : proba qu'un individu classé comme appartenant à la gaussienne 1 appartienne réellement à la gaussienne 1
-- $P(A|C_1)$ : proba qu'un individu appartenant réellement à C1 soit classé comme appartenant à C1 (resp. C2)
-- $P(C_1)$ : probabilité d'appartenir à C1 (resp. C2)
+avec :
 
+-   $P(C_1|A)$ : proba qu'un individu classé comme appartenant à la
+    gaussienne 1 appartienne réellement à la gaussienne 1
+-   $P(A|C_1)$ : proba qu'un individu appartenant réellement à C1 soit
+    classé comme appartenant à C1 (resp. C2)
+-   $P(C_1)$ : probabilité d'appartenir à C1 (resp. C2)
 
 ```{r}
 etapeE <- function (vec, mu1, mu2, s1, s2) {
@@ -204,17 +349,17 @@ etapeE <- function (vec, mu1, mu2, s1, s2) {
 }
 ```
 
-Etape E - initialisation de l'algorithme 
+Etape E - initialisation de l'algorithme
+
 ```{r}
 res.E.1 <- etapeE(vec, mu1.1, mu2.1, s1 = s1.1, s2 = s2.1)
 # res.E.1[[1]]
 ```
 
-
-
 ## Etape M
 
-Pour l'étape M, on part du vecteur de données et de la matrice obtenue à l'étape E précédente.
+Pour l'étape M, on part du vecteur de données et de la matrice obtenue à
+l'étape E précédente.
 
 ```{r}
 etapeM <- function(vecteur,matrice){
@@ -243,26 +388,35 @@ etapeM <- function(vecteur,matrice){
 }
 ```
 
+Etape M - initialisation
 
-Etape M - initialisation 
 ```{r}
 res.M.1 <- etapeM(vec, res.E.1[[1]])
 ```
 
+#### Alternance des étapes E et M et convergence de l'algorithme
 
-## Alternance des étapes E et M et convergence de l'algorithme
+On créé une fonction qui, à partir des éléments suivants en entrée : -
+vec : vecteur de valeurs - nb_iter : nombre d'itérations de l'algorithme
+à réaliser - mu1.init, mu2.init, s1.init, s2.init les valeurs initiales
+des gaussiennes démélangées
 
-On créé une fonction qui, à partir des éléments suivants en entrée : 
-- vec : vecteur de valeurs 
-- nb_iter : nombre d'itérations de l'algorithme à réaliser
-- mu1.init, mu2.init, s1.init, s2.init les valeurs initiales des gaussiennes démélangées
+Cette fonction réalise l'étape E et calcule pour chaque valeur du
+vecteur *vec* les probabilités d'appartenance aux gaussiennes 1 et 2,
+comme vu précédemment.
 
-Cette fonction réalise l'étape E et calcule pour chaque valeur du vecteur *vec* les probabilités d'appartenance aux gaussiennes 1 et 2, comme vu précédemment. 
+La fonction etapeM est ensuite utilisée pour calculer à partir de ce
+vecteur et de la matrice obtenue grâce à l'étape E; les moyennes et
+écarts types pondérés mis à jour, donc réestimés à cette étape. Cette
+fonction sort une liste qui contient le vecteur ainsi que les couples de
+paramètres $(\mu_1 \ , \ \sigma_1)$ et $(\mu_2 \ , \ \sigma_2)$.
 
-La fonction etapeM est ensuite utilisée pour calculer à partir de ce vecteur et de la matrice obtenue grâce à l'étape E; les moyennes et écarts types pondérés mis à jour, donc réestimés à cette étape.
-Cette fonction sort une liste qui contient le vecteur ainsi que les couples de paramètres $(\mu_1 \ , \ \sigma_1)$ et $(\mu_2 \ , \ \sigma_2)$. 
-
-A l'étape suivante, l'étape E est à nouveau réalisée à partir des valeurs mises à jour des paramètres des gaussiennes démélangées. Et les valeurs de ces paramètres sont réestimés à l'étape M avec la matrice des probabilités d'appartenance de chaque individu à chacune des gaussiennes dont les paramètres ont été estimés à l'étape M précédente. On réalise ces étapes jusqu'à atteindre le nombre d'itérations donné en entrée.
+A l'étape suivante, l'étape E est à nouveau réalisée à partir des
+valeurs mises à jour des paramètres des gaussiennes démélangées. Et les
+valeurs de ces paramètres sont réestimés à l'étape M avec la matrice des
+probabilités d'appartenance de chaque individu à chacune des gaussiennes
+dont les paramètres ont été estimés à l'étape M précédente. On réalise
+ces étapes jusqu'à atteindre le nombre d'itérations donné en entrée.
 
 ```{r}
 etapesEM <- function (vec, nb_iter, mu1.init = mu1.1, mu2.init = mu2.1, s1.init = s1.1, s2.init = s2.1 ) {
@@ -288,19 +442,27 @@ etapesEM <- function (vec, nb_iter, mu1.init = mu1.1, mu2.init = mu2.1, s1.init 
 }
 ```
 
+Test de la fonction d'itération
 
-Test de la fonction d'itération 
 ```{r}
 etapesEM(vec = vec, nb_iter = 100)
 ```
 
+#### Critère d'arrêt
 
-## Critère d'arrêt
-On va établit un critère d'arrêt pour que l'algorithme soit stoppé quand ce critère d'arrêt est atteint, au lieu de devoir définir un nombre préalable d'itérations, pouvant être soit : 
-- trop grand (dans ce cas l'algorithme continue à calculer les estimations des paramètres à chaque itérations alors que la convergence aurait été atteinte), ce qui perd du temps et utilise inutilement de la puissance computationnelle 
-- ou trop petit (dans ce cas, l'algorithme s'arrête avant la convergence qui aurait eu lieu avec un nombre plus grand d'itérations), donc les paramètres les plus vraimsemblables des deux gaussiennes ne sont pas estimées.
+On va établit un critère d'arrêt pour que l'algorithme soit stoppé quand
+ce critère d'arrêt est atteint, au lieu de devoir définir un nombre
+préalable d'itérations, pouvant être soit : - trop grand (dans ce cas
+l'algorithme continue à calculer les estimations des paramètres à chaque
+itérations alors que la convergence aurait été atteinte), ce qui perd du
+temps et utilise inutilement de la puissance computationnelle - ou trop
+petit (dans ce cas, l'algorithme s'arrête avant la convergence qui
+aurait eu lieu avec un nombre plus grand d'itérations), donc les
+paramètres les plus vraimsemblables des deux gaussiennes ne sont pas
+estimées.
 
-On va définir comme critère d'arrêt que le log de la vraisemblance soit maximisé.
+On va définir comme critère d'arrêt que le log de la vraisemblance soit
+maximisé.
 
 ```{r}
 etapesEM_autostopped <- function (vec, mu1.init = mu1.1, mu2.init = mu2.1, s1.init = s1.1, s2.init = s2.1 ) {
@@ -343,10 +505,13 @@ etapesEM_autostopped <- function (vec, mu1.init = mu1.1, mu2.init = mu2.1, s1.in
 }
 ```
 
-On test la variabilité du résultat avec des valeurs d'initialisation différentes.
+On test la variabilité du résultat avec des valeurs d'initialisation
+différentes.
+
 ```{r}
 etapesEM_autostopped(vec)
 ```
+
 ```{r}
 etapesEM_autostopped(vec, mu1.init = 17 , mu2.init = 25,s1.init = 0 , s2.init = 5)
 etapesEM_autostopped(vec, mu1.init = 13 , mu2.init = 17,s1.init = 0.5 , s2.init = 0)
@@ -354,25 +519,23 @@ etapesEM_autostopped(vec, mu1.init = 13 , mu2.init = 17,s1.init = 0.5 , s2.init 
 
 ```
 
+Vérification
 
-Vérification 
 ```{r}
 x <- f(13,25,4,6, 400,100)
 hist(x, freq = F, nclass = 50)
 ```
 
-
 Test avec notre vecteur généré pour un autre groupe (res)
+
 ```{r}
 etapesEM_autostopped(vec = res, mu1.init = 0 , mu2.init = 12, s1.init =1 , s2.init = 2)
 ```
 
+#### Conclusion
 
-
-## Conclusion
-
-A partir de la programmation manuelle d'un algorithme itératif d'expectation-maximisation, il est possible de retrouver la loi de mélange de gaussiennes bidimensionnelles dont on peut estimer les paramètres comme l'a prouvé cet exemple. On peut donc s'intéresser à la génération de données. 
-
-
-
-
+A partir de la programmation manuelle d'un algorithme itératif
+d'expectation-maximisation, il est possible de retrouver la loi de
+mélange de gaussiennes bidimensionnelles dont on peut estimer les
+paramètres comme l'a prouvé cet exemple. On peut donc s'intéresser à la
+génération de données.

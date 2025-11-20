@@ -35,7 +35,7 @@ Pour plusieurs variables simultanément, on utilise un **vecteur gaussien** (loi
 
 ---
 
-# Topic Modelling
+## Topic Modelling
 
 Le *topic modelling* est une méthode de classification non supervisée appliquée aux textes.
 
@@ -54,13 +54,13 @@ La méthode générale :
 
 ---
 
-# Classification des données
+## Classification des données
 
 Les données d’entrée d’un algorithme de classification peuvent être :
 - un **tableau individus × variables** (n × p),
 - une **matrice de distances** entre individus.
 
-## Classification hiérarchique ascendante (CAH)
+### Classification hiérarchique ascendante (CAH)
 
 La classification hiérarchique ascendante (CAH) est une méthode agrégative, où on part de n classes (chaque individu seul), on fusionne à chaque étape les classes les plus proches et on obtient un dendrogramme (ou arbre hiérarchique) qui montre les niveaux de regroupement. 
 
@@ -68,7 +68,7 @@ Cette méthode est adaptée aux variables quantitatives (une variable correspond
 
 ---
 
-# Partitionnement direct
+### Partitionnement direct
 
 Le partitionnement direct consiste à **diviser un ensemble d’individus en un nombre fixe de classes**, sans construction hiérarchique (contrairement à la CAH).
 
@@ -93,10 +93,10 @@ On répète ces deux étapes (recalcul des centres et réaffectation), jusqu’�
 
 Un exemple est le k-means, où le calcul des centres de gravité se fait au fur et à mesure de l’affectation de chaque individu. 
 
-## Méthodes mixtes
+### Méthodes mixtes
 Les méthodes mixtes combinent le partitionnement direct et la CAH. On réalise un partitionnement direct pour obtenir des centres de classes initiaux et on applique une CAH sur ces centres. Cela permet de réduire le nombre d’individus pour réaliser la CAH.
 
-# TD : étude appliqué sur le saumon 
+## TD : étude appliqué sur le saumon 
 
 On dispose d’un jeu de donné structuré en 3 blocs :
 
@@ -107,7 +107,7 @@ On dispose d’un jeu de donné structuré en 3 blocs :
 - Un bloc « noir » : situé sous le bloc rouge, il présente les saumons en colonnes et les paramètre physico-chimiques (inconnus des individus) en lignes.
 
 
-
+### Problématique
 __Problématique : le “problème du 4ème coin”.__ 
 L’objectif est de comprendre comment les préférences hédoniques des consommateurs s’articulent avec leurs habitudes de consommation et les caractéristiques physico-chimiques des produits. Autrement dit, de vérifier si ce qu’expriment les individus à propos de leur consommation en saumon est exacte ou non.
 
@@ -120,12 +120,13 @@ Pour cela, on va :
 
 Cette approche permet notamment de vérifier si les déclarations des individus concernant leur consommation de saumon sont cohérentes avec la réalité. Par exemple, si un groupe d’individus affirment préférer les saumons salés (variable Not.to.salty_No du bloc bleu), on devrait observer une corrélation avec le paramètre « salt » du bloc noir. Cela confirmerait la fiabilité de leurs descriptions sensorielles et la pertinence de leurs jugements lors de la notation des produits.
 
+### Méthode
+
 Nous allons procéder en 3 étapes :
 
 **Etape 1 :** Analyse du bloc rouge (individus x saumons)
 L’objectif : regrouper les individus selon leurs préférences hédoniques vis-à-vis des différents saumons. 
 
-Méthode : 
 
 - Réalisation d’un ACP (PCA()) sur les variables quantitatives du bloc rouge
 
@@ -154,7 +155,7 @@ Méthode :
 
 - Terminer par une HCPC() pour observer à quelles classes se rattachent les individus
 
-## Interprétations
+### Interprétations
 L’analyse hiérarchique sur composantes principales (HCPC) réalisée sur le jeu de données dta_saumon a permis d’identifier trois groupes distincts de consommateurs selon leurs perceptions sensorielles, leurs jugements qualitatifs et leurs préférences à l’égard de différents produits à base de saumon.
 
 Ces classes sont issues du traitement statistique res.HCPC.3$desc.var, qui met en évidence les variables discriminantes et leur poids explicatif (v.test, p-value, moyennes).

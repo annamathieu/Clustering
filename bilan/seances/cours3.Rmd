@@ -1,8 +1,140 @@
 ---
-title: "Classification Non Supevisée , cours 1"
+title: "Classification Non Supevisée , cours 3"
 author: "Anna Mathieu"
 date: "`r Sys.Date()`"
 output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
-Tout ce que nous avons retenu du cours 2!
+Loi de mélange, distributions gaussiennes et théorème de Bayes
+
+Une loi de mélange est un modèle statistique qui combine plusieurs
+distributions de probabilité (souvent des lois gaussiennes) pour
+représenter des données complexes composées de plusieurs
+sous-populations. Chaque composante du mélange correspond à une classe
+ou un groupe de données distinct. La densité de probabilité totale du
+mélange est notée f(x) et chaque composante suit une loi gaussienne
+multivariée, c’est-à-dire une distribution normale dans un espace à
+plusieurs dimensions. Pour une gaussienne bivariée (deux dimensions, d =
+2), chaque observation est un vecteur à deux composantes (x,y), ce qui
+définit une surface de réponse z correspondant à la densité. Chaque
+classe k du mélange est caractérisée par : un vecteur de moyennes :
+μk=(μ1k,μ2k) une matrice de covariance : Σk un poids πk, représentant la
+proportion de la classe k dans le mélange avec la contrainte ∑kπk=1.
+Structure des données : indépendance vs dépendance La forme de la
+distribution (observée sur les graphiques/diapos) nous renseigne sur les
+relations entre les variables : Diapo 98 – Forme circulaire : Lorsque la
+densité est circulaire, cela signifie qu’aucune dimension ne domine
+l’autre, et qu’il n’y a pas de corrélation entre les variables. :
+Situation d’indépendance (comme en ACP, lorsque les axes sont
+orthogonaux et expliquent chacun la même part de variabilité). Diapos
+99–100 – Corrélation positive : Quand les données s’étirent le long
+d’une diagonale ascendante (de bas-gauche à haut-droit), cela indique
+une corrélation positive entre x et y. Par définition du coefficient de
+corrélation, les covariances (termes hors diagonale de la matrice) sont
+positives. Quand x augmente, y augmente aussi. Diapo 101 – Déplacement
+du vecteur des moyennes : Le centre de la distribution (μ1,μ2) s’est
+déplacé. Cela se traduit par un vecteur moyenne non nul (les valeurs de
+µ sont positives ou différentes de zéro). Diapo 103 – Corrélation
+négative : La forme de la distribution s’étire le long d’une diagonale
+descendante. La covariance est négative : quand une variable augmente,
+l’autre diminue. Les zones les plus denses (souvent en bleu sur les
+cartes de densité) correspondent aux régions les plus probables.
+Interprétation du mélange Chaque classe du modèle correspond à une loi
+gaussienne particulière. Le poids πk indique la proportion de cette
+classe dans la population totale.En combinant toutes les composantes
+pondérées par leurs πk, on obtient la densité totale du mélange.
+
+P-valeur et hypothèse H₀ La p-valeur représente la probabilité d’obtenir
+une valeur d’observation aussi extrême (ou plus) que celle mesurée, sous
+l’hypothèse nulle H0. Une p-valeur faible indique que l’observation est
+peu probable si H0 est vraie. On a donc davantage de raisons de rejeter
+H0. Approche du maximum de vraisemblance L’estimation par maximum de
+vraisemblance (MLE) consiste à déterminer les paramètres inconnus
+(moyennes, variances, etc.) qui rendent les données observées les plus
+probables. En 1 dimension, le paramètre estimé correspond à la moyenne.
+En 2 dimensions, il s’agit du centre de gravité de la distribution.
+Cette approche repose sur la fonction de vraisemblance, qui mesure la
+probabilité d’obtenir les observations pour un certain choix de
+paramètres. Méthodologie : On a un échantillon de données X1, X2, …, Xn,
+qui sont supposées indépendantes et suivant une loi paramétrée par un ou
+plusieurs paramètres θ. La fonction de vraisemblance s’écrit :
+
+$$L(\theta) = P(X_1 = x_1, \ldots, X_n = x_n \mid \theta) = \prod_{i=1}^{n} f(x_i \mid \theta)$$
+
+Afin de simplifier les calculs, on applique le logarithme. Ainsi
+maximiser la vraisemblance ou le log de la vraisemblance revient
+exactement au même, car la fonction log est strictement croissante.
+Ensuite, on dérive la fonction par rapport au paramètre θ et on annule
+cette dérivée pour trouver le maximum de la fonction. Exemple appliqué :
+calcul de la fonction de vraisemblance et θ Considérons un dé à 4 faces
+dont les probabilités dépendent d’un paramètre inconnu θ P(1) = ½, P(2)
+= θ , P3 = 2θ et P4 = ½ -3θ Et α1 = nombre de 1, α2 = nombre de 2, α3 =
+nombre de 3, α4 = nombre de 4
+
+Tout d’abord on écrit la fonction de vraisemblance : 
+
+$$L(θ) = C \ *\ P(1)^{α_1}\ * \ P(2)^{α_2} * \ P(3)^{α_3} * \ P(4)^{α_4}$$
+
+$$L(\theta) = C \times \left(\frac{1}{2}\right)^{x_1} \times \theta^{n_2} \times (2\theta)^{x_2} \times \left(\frac{1}{2-3\theta}\right)^{x_3}$$
+
+Ensuite on passe au log :
+$$\ln L(\theta) = \text{constante} + \alpha_1 \ln\left(\frac{1}{2}\right) + \alpha_2 \ln(\theta) + \alpha_3 \ln(2\theta) + \alpha_4 \ln\left(\frac{1}{2} - 3\theta\right)$$
+
+Le log permet de transformer les produits en somme, donc de simplifier l'optimisation tout en préservant les maxima. 
+
+Puis on dérive par rapport à θ, qui est notre inconnue :
+$$\frac{d\ell}{d\theta} = \frac{\alpha_2 + \alpha_3}{\theta} - \frac{3\alpha_4}{\frac{1}{2} - 3\theta}$$
+
+Puis on résout :
+$$\hat{\theta} = \frac{\alpha_2 + \alpha_3}{6(\alpha_2 + \alpha_3 + \alpha_4)}$$
+
+
+Probabilités conditionnelles / Théorème de Bayes Lorsqu’un événement
+influence la probabilité d’un autre, on parle de probabilité
+conditionnelle. Soient deux évènement A et B, la probabilité
+conditionnelle de A sachant B est donnée par : 
+
+$$P(A) = \frac{P(A \cap B)} {P(B)}$$
+
+Elle mesure la probabilité que A se produise, sachant que B est déjà
+réalisé.
+
+Loi des probabilité totales : lorsqu’un événement peut se produire sous
+plusieurs conditions mutuellement exclusives B1, B2, …, Bk, on peut
+exprimer la probabilité totale de A par :
+
+$$P(A) = \sum P(A | \ B_i) \ * \ P(B_i)$$
+
+Le théorème de Bayes découle directement de la définition de la
+probabilité conditionnelle. 
+
+$$P(A\ |\ B) = \frac {P(B\ | \ A) * \ P(A)}{P(B)}$$
+
+Le théorème permet de mettre à jour une probabilité à priori P(A) en
+fonction d’une nouvelle information B. P(A) : probabilité à priori (ce
+qu’on croit avant d’observer les données) P(B\|A) : vraisemblance (la
+probabilité d’observer B si A est vrai) P(A\|B) : probabilité à
+posteriori (la probabilité mise à jour après avoir observé B)
+
+Exemple appliqué : probabilités conditionnelles On considère une
+population de voitures dans laquelle : 30 % des voitures sont
+défectueuses, soit P(C1) = 0,30 70 % des voitures sont en bon état, soit
+P(C2) = 0,70 Un mécanicien effectue un diagnostic : Il détecte
+correctement 90 % des voitures défectueuses : P(A∣C1) = 0,90 Il détecte
+correctement 80 % des voitures en bon état : P(A∣C2) = 0,8 On calcule la
+probabilité que le mécanicien fasse un bon diagnostic toutes voitures
+confondues, en utilisant la loi des probabilités totales : P(A) =
+P(A∣C1) × P(C1) + P(A∣C2) × P(C2) = 0,9 × 0,3 + 0,8 × 0,7 = 0,83 Le
+mécanicien fait donc un bon diagnostic dans 83 % des cas. On cherche
+P(C1∣A), c’est-à-dire la probabilité qu’une voiture soit défectueuse
+sachant que le diagnostic est bon : P(C1∣A)=P(A∣C1)×P(C1)P(A) =
+0,9×0,300,83 = 0,325 La probabilité d’avoir une voiture défectueuse
+augmente légèrement après un bon diagnostic (de 30 % à 32,5 %). Le
+diagnostic est donc meilleur que le hasard. On cherche maintenant
+P(C1∣A), c’est-à-dire la probabilité qu’une voiture soit défectueuse
+sachant que le diagnostic est faux. P(C1∣A)=P(A∣C1)×P(C1)P(A) =
+0,1×0,70,83 = 0,176 La probabilité qu’une voiture soit défectueuse
+diminue si le mécanicien se trompe (de 30 % à 17,6 %).
