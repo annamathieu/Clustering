@@ -124,7 +124,7 @@ res <- f(0, 10, 2, 3, 300, 200)
 res
 
 # envoi du vecteur 
-write.csv(res, 'res.csv')
+# write.csv(res, 'res.csv')
 ```
 
 #### Chargement des données reçues du groupe 4
