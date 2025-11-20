@@ -59,6 +59,40 @@ Cette méthode est adaptée aux variables quantitatives (une variable
 correspond à une dimension) et aux variables qualitatives (une modalité
 correspond à une dimension).
 
+Dans les méthodes hiérarchiques, on construit différents niveau de
+partition puis on choisit a posteriori selon des critères définis le
+nombre de clusters à retenir.
+
+En CAH, la méthode est la suivante :
+
+-   (Construction d'un plan ou espace dans lequel les objets à
+    classifier se trouvent)
+
+-   Choix de la mesure de distance (euclidienne, ... )
+
+-   Choix du critère aggrégatif entre les groupes
+
+-   Mise en oeuvre de la méthode, calculs des distances entre les
+    objets, à chaque étape, les objets les plus proches (plus faible
+    distance les séparant) sont regroupés dans un groupe. Pour aggréger
+    des groupes, on se base sur le critère d'agrégation.
+
+-   Construction du dendogramme
+
+-   Choix a posteriori de la variable latente, de classe.
+
+Voici un schéma de ce processus. La distance est une distance
+euclidienne et le critère d'aggrégation est un critère de distance
+moyenne (distance des centres de gravité).
+
+```{r, echo = F}
+knitr::include_graphics('images/CAH1.png')
+```
+
+```{r, echo = F}
+knitr::include_graphics('images/CAH2.png')
+```
+
 ------------------------------------------------------------------------
 
 ### Partitionnement direct
