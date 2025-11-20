@@ -8,9 +8,7 @@ editor_options:
     wrap: 72
 ---
 
-## Génération de données
-
-### Algorithme EM
+## Algorithme EM
 
 L’algorithme EM est une méthode d’optimisation itérative utilisée pour
 estimer les paramètres d’un modèle statistique lorsque certaines
@@ -56,7 +54,7 @@ de ce vecteur Calculer les probabilités d’appartenance à chaque classe à
 partir des moyennes initiales Mettre à jour les moyennes des classes
 Répéter les étapes E et M jusqu’à stabilisation des résultats
 
-### Exemple de l'algorithme EM sur proba de dé
+## Exemple de l'algorithme EM sur proba de dé
 
 Considérons un dé à 4 faces dont les probabilités dépendent d’un
 paramètre inconnu θ\
@@ -83,7 +81,7 @@ Initialisation θ(0) = 0, Etape E : α1 = 20 et α2 = 0 Etape M : θ(1) =
 Puis on recalcule α1 et α2 avec la nouvelle valeur de θ, puis on calcule
 θ et ainsi de suite jusqu’à convergence.
 
-### Processus génératif de données et aux lois de mélange de gaussiennes bidimensionnelles
+## Processus génératif de données et aux lois de mélange de gaussiennes bidimensionnelles
 
 On s'intéresse aux processus génératif de données et aux lois de mélange
 de gaussiennes bidimensionnelles. Connaissant l'allure des données
@@ -127,7 +125,7 @@ res
 # write.csv(res, 'res.csv')
 ```
 
-#### Chargement des données reçues du groupe 4
+### Chargement des données reçues du groupe 4
 
 On reçoit d'un autre groupe de la classe un vecteur de taille 1x500,
 similairement généré par mélange de deux gaussiennes.
@@ -142,7 +140,7 @@ vec <- sapply(vec, as.numeric)
 hist(vec, nclass = 50, freq = F)
 ```
 
-#### Initialisation de l'algorithme
+### Initialisation de l'algorithme
 
 On choisit des vecteurs de paramètres permettant d'initialiser
 l'algorithme. On choisit $N(14,5)$ et $N(26,10)$.
@@ -236,7 +234,7 @@ pondérées de recalculer une meilleure estimation des vecteurs de
 paramètres des gaussiennes 1 et 2, puis répéter ces deux opérations
 jusqu'à convergence de l'algorithme.
 
-#### Etape E
+### Etape E
 
 L'objectif de l'étape E est d'étiquetter chacune des valeurs du vecteur
 *res* avec une probabilité d'appartenance à chacune des gaussiennes
@@ -356,7 +354,7 @@ res.E.1 <- etapeE(vec, mu1.1, mu2.1, s1 = s1.1, s2 = s2.1)
 # res.E.1[[1]]
 ```
 
-## Etape M
+### Etape M
 
 Pour l'étape M, on part du vecteur de données et de la matrice obtenue à
 l'étape E précédente.
@@ -394,7 +392,7 @@ Etape M - initialisation
 res.M.1 <- etapeM(vec, res.E.1[[1]])
 ```
 
-#### Alternance des étapes E et M et convergence de l'algorithme
+### Alternance des étapes E et M et convergence de l'algorithme
 
 On créé une fonction qui, à partir des éléments suivants en entrée : -
 vec : vecteur de valeurs - nb_iter : nombre d'itérations de l'algorithme
@@ -448,7 +446,7 @@ Test de la fonction d'itération
 etapesEM(vec = vec, nb_iter = 100)
 ```
 
-#### Critère d'arrêt
+### Critère d'arrêt
 
 On va établit un critère d'arrêt pour que l'algorithme soit stoppé quand
 ce critère d'arrêt est atteint, au lieu de devoir définir un nombre
@@ -532,7 +530,7 @@ Test avec notre vecteur généré pour un autre groupe (res)
 etapesEM_autostopped(vec = res, mu1.init = 0 , mu2.init = 12, s1.init =1 , s2.init = 2)
 ```
 
-#### Conclusion
+### Conclusion
 
 A partir de la programmation manuelle d'un algorithme itératif
 d'expectation-maximisation, il est possible de retrouver la loi de
