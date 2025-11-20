@@ -40,6 +40,12 @@ r.files.vec <- list.files(sections.path)
 r.files.vec <- r.files.vec[grepl(".Rmd", r.files.vec)]
 ```
 
+# Introduction
+```{r child = intro.Rmd}
+
+```
+
+
 # Seance 1
 ```{r child = 'seances/cours1.Rmd'}
 
@@ -57,6 +63,16 @@ r.files.vec <- r.files.vec[grepl(".Rmd", r.files.vec)]
 
 # Seance 4 
 ```{r child = 'seances/cours4.Rmd'}
+
+```
+
+# Seance 4 
+```{r child = 'seances/cours5.Rmd'}
+
+```
+
+# Seance 4 
+```{r child = 'seances/cours6.Rmd'}
 
 ```
 
