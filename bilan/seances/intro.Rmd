@@ -42,6 +42,12 @@ classification non supervisée fait donc appel à une notion de distance
 (dont le choix est primordial) qui est la base de la classification
 d'objets.
 
+Les données d’entrée d’un algorithme de classification peuvent être :
+
+\- un **tableau individus × variables** (n × p),
+
+\- une **matrice de distances** entre individus.
+
 La matrice des distances est donc un point de départ possible de tout
 algorithme de classification. C’est une matrice carrée de taille n × n
 qui contient toutes les distances entre paires d’objets.
@@ -76,9 +82,18 @@ Il existe différents types de stratégie de classification : le
 partitionnement direct et la classification ascendante hierarchique (et
 les stratégies mixtes qui les combinent). En partitionnement direct, le
 nombre de clusters K en lequel les objets seront divisés est déterminé à
-l'avance. En CAH, les objets ou individus sont regroupés progressivement
-en groupes pour former un dendogramme, que l'on peut ensuite couper à
-différents niveaux pour obtenir la finesse de la partition souhaitée.
+l'avance.
+
+La classification hiérarchique ascendante (CAH) est une méthode
+agrégative, où on part de n classes (chaque individu seul), on fusionne
+à chaque étape les classes les plus proches et on obtient un
+dendrogramme (ou arbre hiérarchique) qui montre les niveaux de
+regroupement, que l'on peut ensuite couper à différents niveaux pour
+obtenir la finesse de la partition souhaitée.
+
+Cette méthode est adaptée aux variables quantitatives (une variable
+correspond à une dimension) et aux variables qualitatives (une modalité
+correspond à une dimension).
 
 ## De la classification aux lois de mélanges
 
@@ -95,6 +110,9 @@ peut être modélisée comme une variable latente.
 
 ## Des lois de mélange aux topic modelling
 
+Le *topic modelling* est une méthode de classification non supervisée
+appliquée aux textes.
+
 On cherche à comprendre le processus génératif d'un document, en
 applicant les méthodes évoquées précédemment. L'objectif est de savoir
 comment un document à été généré. Or, on peut définir un document comme
@@ -103,3 +121,19 @@ des proportions spécifiques. De plus, un topic est défini comme une
 distribution aléatoire de mots. On cherche a faire du reverse
 engineering et retrouver, à partir de documents, les processus qui ont
 permis leur génération.
+
+Un **topic** (ou « sujet ») correspond à une **distribution de mots
+récurrents** dans un corpus.
+
+Les objectifs sont :
+
+\- Estimer la **proportion de chaque topic dans chaque document**.\
+- Identifier les **mots caractéristiques** associés à chaque topic.
+
+La méthode générale : 1. Identifier les topics dans chaque texte.\
+2. Nommer les variables latentes (topics) selon les mots les plus
+fréquents.\
+3. Fusionner les tableaux représentant les topics.\
+4. Calculer les distances entre topics.\
+5. Appliquer une analyse multidimensionnelle pour visualiser les
+proximités.
