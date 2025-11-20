@@ -1,0 +1,7 @@
+---
+title: "Bilan de la séance 6 : Topic Modelling"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+Le cours 6 est super! il faut le faire quand même.
