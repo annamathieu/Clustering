@@ -113,6 +113,10 @@ le nombre d’individus pour réaliser la CAH.
 
 ## TD : étude appliqué sur le saumon
 
+```{r}
+knitr::include_graphics('images/saumon.png')
+```
+
 On dispose d’un jeu de donné structuré en 3 blocs :
 
 -   Un bloc « rouge » : avec les individus en lignes et les saumons en
