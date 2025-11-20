@@ -26,6 +26,10 @@ La « structure » des données est une vue bien particulière sur les objets. E
 
 La matrice des distances est donc un point de départ possible de tout algorithme de classification. C’est une matrice carrée de taille n × n  qui contient toutes les distances entre paires d’objets.
 
+Cette matrice peut être une matrice de : 
+- distance , qui mesure l'écart entre deux objets (dans un espace donné)
+- dissimilarité, qui mesure le degré de différence entre 2 objets donnés 
+
 
 ## Critères d’agrégation
 En classification hiérarchique, on utilise un critère d’agrégation pour décider comment fusionner les groupes. On ne se place plus au niveau des individus, mais au niveau des aggrégats d'individus.
@@ -37,9 +41,9 @@ La classification d'objet peut être déterministe, c'est à dire qu'un objet ou
 Il existe différents types de stratégie de classification : le partitionnement direct et la classification ascendante hierarchique (et les stratégies mixtes qui les combinent). En partitionnement direct, le nombre de clusters K en lequel les objets seront divisés est déterminé à l'avance. En CAH, les objets ou individus sont regroupés progressivement en groupes pour former un dendogramme, que l'on peut ensuite couper à différents niveaux pour obtenir la finesse de la partition souhaitée. 
 
 ## De la classification aux lois de mélanges
-On s'intéresse au processus génératif de données, dans le cadre de lois de mélanges de gaussiennes multidimensionnelles. On se demande si on peut retrouver le processus qui a permis d'aboutir à la génération de données dans un cas simple (mélange de gaussiennes multidimensionnelles). L'objectif est d'appliquer des algorithmes d'optimisation afin d'obtenir les paramètres les plus vraisemblables, ayant pu permettre de générer ces données. On estime ces paramètres grâce aux données elles-mêmes. 
+On s'intéresse au processus génératif de données, dans le cadre de lois de mélanges de gaussiennes multidimensionnelles. On se demande si on peut retrouver le processus qui a permis d'aboutir à la génération de données dans un cas simple (mélange de gaussiennes multidimensionnelles). L'objectif est d'appliquer des algorithmes d'optimisation afin d'obtenir les paramètres les plus vraisemblables, ayant pu permettre de générer ces données. On estime ces paramètres grâce aux données elles-mêmes. Ces algorithmes d'optimisation sont basés sur le théorème de Bayes. La probabilité d'appartenance à une classe peut être modélisée comme une variable latente. 
 
 ## Des lois de mélange aux topic modelling 
-On cherche à comprendre le processus génératif d'un document, en applicant les méthodes évoquées précédemment.  
+On cherche à comprendre le processus génératif d'un document, en applicant les méthodes évoquées précédemment. L'objectif est de savoir comment un document à été généré. Or, on peut définir un document comme une distribution de topics (les sujets dont il est composé), associés à des proportions spécifiques. De plus, un topic est défini comme une distribution aléatoire de mots. On cherche a faire du reverse engineering et retrouver, à partir de documents, les processus qui ont permis leur génération.   
 
 
