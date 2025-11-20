@@ -1,18 +1,17 @@
 ---
-title: "Classification Non Supevisée , cours 1"
-author: "Anna Mathieu"
+title: "Classification Non Supevisée , introduction"
 date: "`r Sys.Date()`"
 output: html_document
 ---
 
-Qu’est-ce que la classification non supervisée ?
+## Qu’est-ce que la classification non supervisée ?
 
 La classification non supervisée est une méthode d’analyse qui vise à regrouper des objets (individus, produits, observations, etc.) en classes homogènes, sans connaître à l’avance ces classes.
 Contrairement à la classification supervisée, il n’y a pas de variable à prédire : on cherche simplement à découvrir des structures cachées dans les données.
 
-Pourquoi faire de la classification ?
+## Pourquoi faire de la classification ?
 
-L’objectif est de réduire la complexité d’un jeu de données en mettant en évidence des structures internes :
+L’objectif est de réduire la complexité d’un jeu de données en mettant en évidence des structures internes qui permettent de comprendre les données :
 On simplifie la lecture et l’interprétation.
 On identifie des groupes d’objets similaires.
 
@@ -21,9 +20,26 @@ Pour classer, il faut pouvoir mesurer la proximité entre objets : c’est le r�
 
 « Qui dit distance métrique dit contrainte spatiale » Autrement dit, chaque individu est un point dans un espace à plusieurs dimensions et la distance traduit sa ressemblance avec un autre point.
 
-Matrice des distances
+## Matrice des distances / dissimilarités
 
-La matrice des distances est le point de départ de toute classification. C’est une matrice carrée de taille n × n  qui contient toutes les distances entre paires d’objets.
+La « structure » des données est une vue bien particulière sur les objets. Elle est définie par une notion de distances entre les objets, le principe de la classification non supervisée étant de regrouper des objets similaires (donc peu distants, ou « proches ») et de distinguer les objets différents ( « éloignés »  les uns des autres). La classification non supervisée fait donc appel à une notion de distance (dont le choix est primordial) qui est la base de la classification d'objets. 
 
-Critères d’agrégation
-En classification hiérarchique, on utilise un critère d’agrégation pour décider comment fusionner les groupes.
+La matrice des distances est donc un point de départ possible de tout algorithme de classification. C’est une matrice carrée de taille n × n  qui contient toutes les distances entre paires d’objets.
+
+
+## Critères d’agrégation
+En classification hiérarchique, on utilise un critère d’agrégation pour décider comment fusionner les groupes. On ne se place plus au niveau des individus, mais au niveau des aggrégats d'individus.
+
+## Critère de classification  
+La classification d'objet peut être déterministe, c'est à dire qu'un objet ou individu va être assigné à l'appartenance à une classe uniquement, ou elle peut être probabiliste, c'est à dire que l'appartenance de l'individu ou de l'objet à une classe sera associée à une probabilité d'appartenance à cette classe, la somme de toutes les probabilités d'appartenance d'un individu à l'ensemble des classes étant de 1.
+
+## Stratégie de classification 
+Il existe différents types de stratégie de classification : le partitionnement direct et la classification ascendante hierarchique (et les stratégies mixtes qui les combinent). En partitionnement direct, le nombre de clusters K en lequel les objets seront divisés est déterminé à l'avance. En CAH, les objets ou individus sont regroupés progressivement en groupes pour former un dendogramme, que l'on peut ensuite couper à différents niveaux pour obtenir la finesse de la partition souhaitée. 
+
+## De la classification aux lois de mélanges
+On s'intéresse au processus génératif de données, dans le cadre de lois de mélanges de gaussiennes multidimensionnelles. On se demande si on peut retrouver le processus qui a permis d'aboutir à la génération de données dans un cas simple (mélange de gaussiennes multidimensionnelles). L'objectif est d'appliquer des algorithmes d'optimisation afin d'obtenir les paramètres les plus vraisemblables, ayant pu permettre de générer ces données. On estime ces paramètres grâce aux données elles-mêmes. 
+
+## Des lois de mélange aux topic modelling 
+On cherche à comprendre le processus génératif d'un document, en applicant les méthodes évoquées précédemment.  
+
+
