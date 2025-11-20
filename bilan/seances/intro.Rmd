@@ -129,11 +129,3 @@ Les objectifs sont :
 
 \- Estimer la **proportion de chaque topic dans chaque document**.\
 - Identifier les **mots caractéristiques** associés à chaque topic.
-
-La méthode générale : 1. Identifier les topics dans chaque texte.\
-2. Nommer les variables latentes (topics) selon les mots les plus
-fréquents.\
-3. Fusionner les tableaux représentant les topics.\
-4. Calculer les distances entre topics.\
-5. Appliquer une analyse multidimensionnelle pour visualiser les
-proximités.
