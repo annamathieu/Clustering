@@ -258,7 +258,7 @@ La première étape consiste à **représenter graphiquement l’ensemble des co
 library(tidyverse)
 
 #Importation des données
-df <- read.table("data2.csv",header=TRUE,sep=";",dec=".")
+df <- read.table("data/data2.csv",header=TRUE,sep=";",dec=".")
 
 #Conversion des colonnes en numériques 
 df[,1:101] <- lapply(df[,1:101],as.numeric)

@@ -132,7 +132,7 @@ similairement généré par mélange de deux gaussiennes.
 
 ```{r}
 # Visualisation des données du vecteur 
-vec <- read.table("vecteur_4.csv", sep = ",")
+vec <- read.table("data/vecteur_4.csv", sep = ",")
 vec <- vec$V2
 vec <- vec[-1]
 vec <- sapply(vec, as.numeric)
