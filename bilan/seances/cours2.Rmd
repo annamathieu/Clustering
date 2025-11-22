@@ -86,11 +86,11 @@ euclidienne et le critère d'aggrégation est un critère de distance
 moyenne (distance des centres de gravité).
 
 ```{r, echo = F}
-knitr::include_graphics('images/CAH1.png')
+knitr::include_graphics('seances/images/CAH1.png')
 ```
 
 ```{r, echo = F}
-knitr::include_graphics('images/CAH2.png')
+knitr::include_graphics('seances/images/CAH2.png')
 ```
 
 ------------------------------------------------------------------------
@@ -148,7 +148,7 @@ le nombre d’individus pour réaliser la CAH.
 ## TD : étude appliqué sur le saumon
 
 ```{r}
-knitr::include_graphics('images/saumon.png')
+knitr::include_graphics('seances/images/saumon.png')
 ```
 
 On dispose d’un jeu de donné structuré en 3 blocs :
