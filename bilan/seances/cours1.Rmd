@@ -12,11 +12,11 @@ On se questionne donc sur la notion de distances entre les objets.
 La distance entre deux variables doit pouvoir mettre en évidence que deux variables sont proches l’une de l’autre, ou que deux variables sont éloignées l’une de l’autre. Les variables étant des mesures sur les individus, si deux variables sont proches, alors, les valeurs prises par les individus sur ces deux variables reflètent une proximité entre ces variables.
 
 ```{r, echo=F}
-knitr::include_graphics('images/matr_dist.png')
+knitr::include_graphics('seances/images/matr_dist.png')
 ```
 
 ``` {r, echo=F}
-knitr::include_graphics('images/var.png')
+knitr::include_graphics('seances/images/var.png')
 ```
 
 Les variables A et B sont-elles proches dans la situation 1 ? Oui, car les valeurs prises par les individus pour la variable A et pour la variable B se comportent de la même manière : les individus qui ont tendance à prendre des fortes valeurs pour la variable A ont tendance à prendre aussi des fortes valeurs pour la variable B (ou de faibles valeurs,.... ). Et dans la situation 2?
