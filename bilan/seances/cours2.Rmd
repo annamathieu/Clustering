@@ -164,7 +164,7 @@ On dispose d’un jeu de donné structuré en 3 blocs :
 
 -   Un bloc « noir » : situé sous le bloc rouge, il présente les saumons
     en colonnes et les paramètre physico-chimiques (inconnus des
-    individus) en lignes.
+    individus) en lignes (ex : taux de sel, etc)
 
 ### Problématique
 
@@ -175,8 +175,11 @@ caractéristiques physico-chimiques des produits. Autrement dit, de
 vérifier si ce qu’expriment les individus à propos de leur consommation
 en saumon est exacte ou non.
 
-Pour cela, on va : - Classer les consommateurs selon leurs préférences
-hédoniques.
+Pour cela, on va :
+
+-   Classer les consommateurs selon leurs préférences hédoniques.
+
+<!-- -->
 
 -   Caractériser les classes obtenues à l’aide des variables d’usage
     (issues du bloc bleu) pour mieux comprendre la structure hédonique.
@@ -211,7 +214,7 @@ conditions de consommation)
 
 L’objectif : interpréter les classes obtenues à l’étape précédente en
 fonction des variables qualitatives décrivant les habitudes ou
-préférences de consommation. Ceci doit permettre de justifier les
+préférences de consommation. Ceci doit permettre de comprendre les
 différences de notes entre individus et d’identifier les descripteurs
 discriminants pour chaque groupe.
 
@@ -219,7 +222,7 @@ Méthode :
 
 -   Réaliser une ACP avec les variables quantitatives du bloc rouge
     comme actives et les variables catégorielles du bloc bleu comme
-    supplémentaires.
+    variables qualitatives supplémentaires.
 -   Utiliser la fonction desc.var() pour extraire les variables les plus
     significatives.
 
@@ -250,6 +253,121 @@ Méthode :
 
 -   Terminer par une HCPC() pour observer à quelles classes se
     rattachent les individus
+
+### Mise en oeuvre
+
+Chargement des données et des packages
+
+```{r, message=F}
+library(factoextra)
+library(FactoMineR)
+
+### Import et traitement des données
+dta_saumon<-read.table("data/saumon.csv",
+                       stringsAsFactors = TRUE,
+                       dec=",",
+                       sep=";",
+                       header = TRUE)
+dta_saumon_N<-dta_saumon[c(1064:1088),c(1,3:32)]
+dta_saumon_RB<-dta_saumon[c(1:1063),]
+dta_saumon_R<-dta_saumon[,c(3:32)]
+
+dta_saumon_R<-as.matrix(dta_saumon_R)
+```
+
+#### Etape 1 : PCA sur dta_saumon_R
+
+```{r}
+res.pca.1<-PCA(dta_saumon_R,graph = TRUE, ncp = 30)
+# res.pca.1$eig
+res.HCPC1 <- HCPC(res.pca.1, nb.clust = -1) # avec nb.clust = -1 : choix optimal du nombre de clusters 
+
+```
+
+Objets de res HCPC :
+
+```{r}
+# 1 - "data.clust" 
+res.HCPC1$data.clust
+# data frame individu actifs et de toutes les variables actives, illustratives, ainsi que de la variable de classe ("clust"=> la dernière variable)
+
+# 2 - "desc.var"  
+# description des classes (clusters)
+res.HCPC1$desc.var$category # v test pour les clusters (test de surreprésentation de la modalité) => modalités caractérisant les groupes
+ ### rappels 
+ ## CLA/MOD : % d'individus qui prennent cette modalité pour cette variable et qui sont dans CE CLUSTER  
+ ## MOD/CLA : % d'individus DE CE CLUST QUI ONT PRIS cette modalité pour cette variable 
+ ## Global  : % d'individus en global qui prennent cette modalité pour cette variable
+ ## p value : proba associé d'observer sous H0 une valeur de v test au moins aussi élevée que celle observée réellement
+ ## v. test : valeur de la stat de test 
+
+# 3 - "desc.axes"   
+res.HCPC1$desc.axes 
+# link between the cluster variable and the quantitative variables
+# Description of each cluster by quantitative variables
+
+
+# 4 - "desc.ind"   
+res.HCPC1$desc.ind$para # individus les plus proches des centres des classes
+res.HCPC1$desc.ind$dist # individus les plus éloignés des centres des autres classes
+```
+
+```{catdes(res.HCPC1$data.clust, num.var = 31) # on cherche à comprendre les clusters}
+```
+
+Avec la fonction "cat des" on réalise la description d'une variable
+catégorielle (la variable de classe) par les variables quantitatives. On
+peut en déduire les saumons les plus appréciés (avec des notes
+d'appréciation hédonique significativement plus élevées que dans les
+autres clusters) et ceux les moins appréciés par les individus de ce
+clusters (resp., avec les notes en moyenne significativement plus
+faibles que dans les autres clusters).
+
+Ainsi, on en déduit que :
+
+-   les individus du cluster 1 apprécient les saumons **16, 26, 18, 25
+    et 28** (leur top 5), et n'aiment pas les saumons **10, 29, 17, 7 et
+    23** (leur bottom 5).
+-   les individus du cluster 2 apprécient les saumons **7, 4, 27, 17 et
+    13** (leur top 5), et n'aiment pas les saumons **16, 12, 8, 30 et
+    20** (leur bottom 5).
+-   les individus du cluster 3 apprécient les saumons **20, 29, 10, 9 et
+    23** (leur top 5), et n'aiment pas les saumons **26, 28, 27, 25 et
+    11** (leur bottom 5).
+
+On peut aussi savoir les produits qui séparent le plus les groupes entre
+eux : il s'agit des saumons **16, 26, 10 et 29**.
+
+#### Etape 2 : PCA sur dta_saumon_R + var illus B
+
+```{r}
+res.pca.2<-PCA(dta_saumon_RB [c(-1,-2)],
+               quali.sup = c(31:98),
+               graph = TRUE)
+
+res.HCPC2 <- HCPC(res.pca.2, nb.clust = -1)
+
+res.HCPC2$desc.var
+
+```
+
+#### Etape 3 : PCA sur dta_saumon_R + var illus B + ind illus N
+
+```{r}
+res.pca.3<-PCA(dta_saumon[c(-1,-2)],
+               quali.sup = c(31:98),
+               ind.sup = 1064:1088,
+               graph = TRUE)
+res.HCPC.3<-HCPC(res.pca.3,nb.clust=-1)
+
+res.HCPC.3$desc.var
+```
+
+### Graphique 
+
+```{r}
+
+```
 
 ### Interprétations
 
