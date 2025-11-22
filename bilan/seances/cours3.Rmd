@@ -10,69 +10,69 @@ editor_options:
 
 Loi de mélange, distributions gaussiennes et théorème de Bayes
 
-Une loi de mélange est un modèle statistique qui combine plusieurs
-distributions de probabilité (souvent des lois gaussiennes) pour
-représenter des données complexes composées de plusieurs
-sous-populations. Chaque composante du mélange correspond à une classe
-ou un groupe de données distinct. La densité de probabilité totale du
-mélange est notée f(x) et chaque composante suit une loi gaussienne
-multivariée, c’est-à-dire une distribution normale dans un espace à
-plusieurs dimensions. Pour une gaussienne bivariée (deux dimensions, d =
-2), chaque observation est un vecteur à deux composantes (x,y), ce qui
-définit une surface de réponse z correspondant à la densité. Chaque
-classe k du mélange est caractérisée par : un vecteur de moyennes :
-μk=(μ1k,μ2k) une matrice de covariance : Σk un poids πk, représentant la
-proportion de la classe k dans le mélange avec la contrainte ∑kπk=1.
-Structure des données : indépendance vs dépendance La forme de la
-distribution (observée sur les graphiques/diapos) nous renseigne sur les
-relations entre les variables : Diapo 98 – Forme circulaire : Lorsque la
-densité est circulaire, cela signifie qu’aucune dimension ne domine
+Une loi de mélange est un modèle statistique qui combine plusieurs distributions de probabilité (souvent des lois gaussiennes) pour représenter des données complexes composées de plusieurs sous-populations. Chaque composante du mélange correspond à une classe ou un groupe de données distinct. La densité de probabilité totale du
+mélange est notée f(x) et chaque composante suit une loi gaussienne multivariée, c’est-à-dire une distribution normale dans un espace à plusieurs dimensions. Pour une gaussienne bivariée (deux dimensions, d = 2), chaque observation est un vecteur à deux composantes (x,y), ce qui définit une surface de réponse z correspondant à la densité. Chaque classe k du mélange est caractérisée par : un vecteur de moyennes : μk=(μ1k,μ2k) une matrice de covariance : Σk un poids πk, représentant la proportion de la classe k dans le mélange avec la contrainte ∑kπk=1.
+Structure des données : indépendance vs dépendance.
+
+La forme de la distribution (observée sur les graphiques/diapos) nous renseigne sur les relations entre les variables : 
+
+On regarde "depuis le haut" la forme de la représentation du lien x1 et x2, pour savoir quelle structure aura la matrice de variance - covariance. Si il n'y a aucun lien entre x1 et x2, alors les variables sont indépendantes, dont leur coefficients de corrélation sont faibles voire nuls, donc la matrice de variance - covariance a presque aucun élément donnant du poids en dehors de la diagonale : on dit que "elle ne charge pas hors diagonale". Au contraire, si x1 et x2 sont fortement corrélés, alors les éléments hors diagonales (coefficients de corrélation entre x1 et x2) seront élevés (corrélation +), ou faible (corrélation -). 
+
+```{r}
+knitr::include_graphics('seances/images/LM1.png')
+```
+
+- Forme circulaire : Lorsque la densité est circulaire, cela signifie qu’aucune dimension ne domine
 l’autre, et qu’il n’y a pas de corrélation entre les variables. :
 Situation d’indépendance (comme en ACP, lorsque les axes sont
-orthogonaux et expliquent chacun la même part de variabilité). Diapos
-99–100 – Corrélation positive : Quand les données s’étirent le long
-d’une diagonale ascendante (de bas-gauche à haut-droit), cela indique
-une corrélation positive entre x et y. Par définition du coefficient de
-corrélation, les covariances (termes hors diagonale de la matrice) sont
-positives. Quand x augmente, y augmente aussi. Diapo 101 – Déplacement
-du vecteur des moyennes : Le centre de la distribution (μ1,μ2) s’est
-déplacé. Cela se traduit par un vecteur moyenne non nul (les valeurs de
-µ sont positives ou différentes de zéro). Diapo 103 – Corrélation
-négative : La forme de la distribution s’étire le long d’une diagonale
-descendante. La covariance est négative : quand une variable augmente,
-l’autre diminue. Les zones les plus denses (souvent en bleu sur les
-cartes de densité) correspondent aux régions les plus probables.
-Interprétation du mélange Chaque classe du modèle correspond à une loi
-gaussienne particulière. Le poids πk indique la proportion de cette
-classe dans la population totale.En combinant toutes les composantes
-pondérées par leurs πk, on obtient la densité totale du mélange.
+orthogonaux et expliquent chacun la même part de variabilité). 
 
-P-valeur et hypothèse H₀ La p-valeur représente la probabilité d’obtenir
-une valeur d’observation aussi extrême (ou plus) que celle mesurée, sous
-l’hypothèse nulle H0. Une p-valeur faible indique que l’observation est
-peu probable si H0 est vraie. On a donc davantage de raisons de rejeter
-H0. Approche du maximum de vraisemblance L’estimation par maximum de
-vraisemblance (MLE) consiste à déterminer les paramètres inconnus
-(moyennes, variances, etc.) qui rendent les données observées les plus
-probables. En 1 dimension, le paramètre estimé correspond à la moyenne.
-En 2 dimensions, il s’agit du centre de gravité de la distribution.
-Cette approche repose sur la fonction de vraisemblance, qui mesure la
-probabilité d’obtenir les observations pour un certain choix de
-paramètres. Méthodologie : On a un échantillon de données X1, X2, …, Xn,
-qui sont supposées indépendantes et suivant une loi paramétrée par un ou
-plusieurs paramètres θ. La fonction de vraisemblance s’écrit :
+```{r}
+knitr::include_graphics('seances/images/LM2.png')
+```
+
+- Corrélation positive : Quand les données s’étirent le long d’une diagonale ascendante (de bas-gauche à haut-droit), cela indique une corrélation positive entre x et y. Par définition du coefficient de corrélation, les covariances (termes hors diagonale de la matrice) sont positives. Quand x augmente, y augmente aussi. Diapo 101 – Déplacement du vecteur des moyennes : Le centre de la distribution (μ1,μ2) s’est déplacé. Cela se traduit par un vecteur moyenne non nul (les valeurs de µ sont positives ou différentes de zéro). 
+
+```{r}
+knitr::include_graphics('seances/images/LM3.png')
+```
+
+Diapo 103 – Corrélation négative : La forme de la distribution s’étire le long d’une diagonale
+descendante. La covariance est négative : quand une variable augmente, l’autre diminue. Les zones les plus denses (souvent en bleu sur les cartes de densité) correspondent aux régions les plus probables.
+
+
+## Interprétation du mélange 
+
+Chaque classe du modèle correspond à une loi gaussienne particulière. Le poids πk indique la proportion de cette
+classe dans la population totale.En combinant toutes les composantes pondérées par leurs πk, on obtient la densité totale du mélange.
+
+## P-valeur et hypothèse H₀ 
+La p-valeur représente la probabilité d’obtenir une valeur d’observation aussi extrême (ou plus) que celle mesurée, sous l’hypothèse nulle H0. Une p-valeur faible indique que l’observation est peu probable si H0 est vraie. On a donc davantage de raisons de rejeter H0. 
+
+## Approche du maximum de vraisemblance 
+L’estimation par maximum de vraisemblance (MLE) consiste à déterminer les paramètres inconnus (moyennes, variances, etc.) qui rendent les données observées les plus probables. 
+- En 1 dimension, le paramètre estimé correspond à la moyenne. 
+- En 2 dimensions, il s’agit du centre de gravité de la distribution.
+
+Cette approche repose sur la fonction de vraisemblance, qui mesure la probabilité d’obtenir les observations pour un certain choix de paramètres. 
+
+Méthodologie : On a un échantillon de données X1, X2, …, Xn, qui sont supposées indépendantes et suivant une loi paramétrée par un ou plusieurs paramètres θ. La fonction de vraisemblance s’écrit :
 
 $$L(\theta) = P(X_1 = x_1, \ldots, X_n = x_n \mid \theta) = \prod_{i=1}^{n} f(x_i \mid \theta)$$
 
-Afin de simplifier les calculs, on applique le logarithme. Ainsi
-maximiser la vraisemblance ou le log de la vraisemblance revient
-exactement au même, car la fonction log est strictement croissante.
-Ensuite, on dérive la fonction par rapport au paramètre θ et on annule
-cette dérivée pour trouver le maximum de la fonction. Exemple appliqué :
-calcul de la fonction de vraisemblance et θ Considérons un dé à 4 faces
-dont les probabilités dépendent d’un paramètre inconnu θ P(1) = ½, P(2)
-= θ , P3 = 2θ et P4 = ½ -3θ Et α1 = nombre de 1, α2 = nombre de 2, α3 =
-nombre de 3, α4 = nombre de 4
+Afin de simplifier les calculs, on applique le logarithme. Ainsi maximiser la vraisemblance ou le log de la vraisemblance revient exactement au même, car la fonction log est strictement croissante. Ensuite, on dérive la fonction par rapport au paramètre θ et on annule cette dérivée pour trouver le maximum de la fonction. 
+
+Exemple appliqué :
+calcul de la fonction de vraisemblance et θ 
+
+Considérons un dé à 4 faces
+dont les probabilités dépendent d’un paramètre inconnu θ
+- P(1) = ½, 
+- P(2) = θ , 
+- P3 = 2θ et 
+- P4 = ½ -3θ 
+
+Et α1 = nombre de 1, α2 = nombre de 2, α3 = nombre de 3, α4 = nombre de 4
 
 Tout d’abord on écrit la fonction de vraisemblance : 
 
@@ -91,50 +91,185 @@ $$\frac{d\ell}{d\theta} = \frac{\alpha_2 + \alpha_3}{\theta} - \frac{3\alpha_4}{
 Puis on résout :
 $$\hat{\theta} = \frac{\alpha_2 + \alpha_3}{6(\alpha_2 + \alpha_3 + \alpha_4)}$$
 
+## Probabilités conditionnelles / Théorème de Bayes 
+Lorsqu’un événement influence la probabilité d’un autre, on parle de probabilité conditionnelle. 
 
-Probabilités conditionnelles / Théorème de Bayes Lorsqu’un événement
-influence la probabilité d’un autre, on parle de probabilité
-conditionnelle. Soient deux évènement A et B, la probabilité
-conditionnelle de A sachant B est donnée par : 
+Soit deux évènement A et B, la probabilité conditionnelle de A sachant B est donnée par : 
 
 $$P(A) = \frac{P(A \cap B)} {P(B)}$$
 
-Elle mesure la probabilité que A se produise, sachant que B est déjà
-réalisé.
+Elle mesure la probabilité que A se produise, sachant que B est déjà réalisé.
 
-Loi des probabilité totales : lorsqu’un événement peut se produire sous
-plusieurs conditions mutuellement exclusives B1, B2, …, Bk, on peut
-exprimer la probabilité totale de A par :
+Loi des probabilité totales : lorsqu’un événement peut se produire sous plusieurs conditions mutuellement exclusives B1, B2, …, Bk, on peut exprimer la probabilité totale de A par :
 
 $$P(A) = \sum P(A | \ B_i) \ * \ P(B_i)$$
 
-Le théorème de Bayes découle directement de la définition de la
-probabilité conditionnelle. 
+Le théorème de Bayes découle directement de la définition de la probabilité conditionnelle. 
 
 $$P(A\ |\ B) = \frac {P(B\ | \ A) * \ P(A)}{P(B)}$$
 
-Le théorème permet de mettre à jour une probabilité à priori P(A) en
-fonction d’une nouvelle information B. P(A) : probabilité à priori (ce
-qu’on croit avant d’observer les données) P(B\|A) : vraisemblance (la
-probabilité d’observer B si A est vrai) P(A\|B) : probabilité à
-posteriori (la probabilité mise à jour après avoir observé B)
+Le théorème permet de mettre à jour une probabilité à priori P(A) en fonction d’une nouvelle information B. P(A) : probabilité à priori (ce qu’on croit avant d’observer les données) P(B\|A) : vraisemblance (la probabilité d’observer B si A est vrai) P(A\|B) : probabilité à posteriori (la probabilité mise à jour après avoir observé B)
 
-Exemple appliqué : probabilités conditionnelles On considère une
-population de voitures dans laquelle : 30 % des voitures sont
-défectueuses, soit P(C1) = 0,30 70 % des voitures sont en bon état, soit
-P(C2) = 0,70 Un mécanicien effectue un diagnostic : Il détecte
-correctement 90 % des voitures défectueuses : P(A∣C1) = 0,90 Il détecte
-correctement 80 % des voitures en bon état : P(A∣C2) = 0,8 On calcule la
-probabilité que le mécanicien fasse un bon diagnostic toutes voitures
-confondues, en utilisant la loi des probabilités totales : P(A) =
-P(A∣C1) × P(C1) + P(A∣C2) × P(C2) = 0,9 × 0,3 + 0,8 × 0,7 = 0,83 Le
-mécanicien fait donc un bon diagnostic dans 83 % des cas. On cherche
-P(C1∣A), c’est-à-dire la probabilité qu’une voiture soit défectueuse
-sachant que le diagnostic est bon : P(C1∣A)=P(A∣C1)×P(C1)P(A) =
-0,9×0,300,83 = 0,325 La probabilité d’avoir une voiture défectueuse
-augmente légèrement après un bon diagnostic (de 30 % à 32,5 %). Le
-diagnostic est donc meilleur que le hasard. On cherche maintenant
-P(C1∣A), c’est-à-dire la probabilité qu’une voiture soit défectueuse
-sachant que le diagnostic est faux. P(C1∣A)=P(A∣C1)×P(C1)P(A) =
-0,1×0,70,83 = 0,176 La probabilité qu’une voiture soit défectueuse
-diminue si le mécanicien se trompe (de 30 % à 17,6 %).
+## Exemple appliqué : Garage automobile
+
+On cherche à acheter une voiture dans un garage, or certaines voiture ont une transmission défectueuse. On ne veut pas acheter une voiture défectueuse. Or, il n'est pas si simple de détecter les voitures qui sont défectueuses. Heureusement, on a un ami mécanicien (ouf!). Celui ci sait donner un diagnostic pour la voiture, mais ce diagnostic n'est pas parfait. En effet, quand il est en face d'une voiture dont la distribution est effectivement défectueuse, il saura faire le bon diagnostic (dire qu'elle l'est) à un certain niveau, et identiquement pour les voitures non défectueuses. Il y aura un risque associé à cette prédiction par le garagiste.
+
+On cherche donc à savoir : quelle est l'apport d'avoir un ami mécanicien ? 
+
+On définit les événements suivants : 
+- A  : le mécanicien dit que la voiture est défectueuse
+- C1 : la transmission de la voiture est défectueuse. (resp. C2, la transmission de la voiture n'est pas défectueuse)
+
+On sait que : 
+- 30 % des voitures ont une transmission défectueuse : donc $P(C1)=0.3$ (resp. $P(C2)=0.7$)
+- le mécanicien donne le bon diagnostic pour 90 % des voitures défectueuses, c'est à dire que quand la transmission est effectivement défectueuse alors il y a 90 % de chances que le diagnostic soit correct (défaut détecté) soit $P(A|C_1)=0.9$
+- et il donne le bon diagnostic à 80 % pour les voitures non défectueuses : quand la transmission est non défectueuse, il y a 80 % de chances que le diagnostic soit correct, soit $P(A|C_2)=0.8$
+
+
+On veut calculer la probabilité que le mécanicien fasse un bon diagnostic pour notre voiture. Cela représente donc le risque associé à l'achat de ce véhicule. On veut le comparer avec P(C1), la probabilité a priori que le véhicule ait une transmission défectueuse, quand on a aucun diagnostic.
+
+On va ainsi utiliser la loi des probabilités totales :
+$$ P(A) = P(A∣C_1) × P(C_1) + P(A∣C_2) × P(C_2) = 0,9 × 0,3 + 0,8 × 0,7 = 0,83
+ $$
+
+Le mécanicien fait donc un bon diagnostic dans 83 % des cas. 
+
+On cherche P(C1∣A), c’est-à-dire la probabilité qu’une voiture soit défectueuse
+sachant que le mécanitien dit qu'elle est défectueuse. Il s'agit de la probabilité a posteriori que la voiture soit défectueuse.
+
+$$ P(C_1∣A)  =\frac {P(A∣C_1)×P(C_1)} {P(A|C_1)* P(C_1)+\  P(A|C_2)* P(C_2)  }      =\frac {0,9×0,3}{0,83} = 0,33 $$
+
+La probabilité d’avoir une voiture défectueuse augmente légèrement après un bon diagnostic (de 30 % à 33 %). Le
+diagnostic est donc meilleur que le hasard. Si le diagnostic est que la voiture est, la probabilité d'avoir une voiture défectueuse est supérieure au hasard, donc le diagnostic a de la valeur. En effet, lorsque le mécanicien dit que la voiture est défectueuse, on a 33 % qu'elle soit défectueuse alors que sans aucune connaissance, on a 30 % de chances que la voiture soit défectueuse.
+
+
+On cherche maintenant $P(C_1∣ \overline{A})$, c’est-à-dire la probabilité qu’une voiture soit défectueuse sachant que le diagnostic du mécanicien est que la voiture est non défectueuse. On voudrait que cette probabilité soit inférieure à la probabilité à priori que la voiture soit défectueuse (30%) car sinon le hasard serait plus utile que le diagnostic.                                                      
+
+$P(\overline{A}∣C_1) = 1 - P(A∣C_1)$ = 1 - 0.9 = 0.1
+$P(\overline{A}∣C_2) = 1 - P(A∣C_2)$ = 1 - 0.8 = 0.2
+
+
+$$ P(C_1∣ \overline{A})  =\frac {P(\overline{A}∣C_1)×P(C_1)} {P(\overline{A}|C_1)* P(C_1)+\  P (\overline{A}|C_2)* P(C_2)  }      =\frac {0,1×0,3}{0,1×0.3 \ + 0.2×0.7} = 0,18 $$
+
+La probabilité qu’une voiture soit réellement défectueuse si le mécanicien dit que la voiture est défectueuse est de 18 %, donc en écoutant le mécanicien, le risque d'avoir une voiture défectueuse diminue. Il est donc utile d'avoir cet ami mécanicien sous la main.
+
+Pour conclure sur cet exemple, nous avons mis en évidence l'utilisation du théorème de Bayes et des probabilités conditionnelles
+
+## Exemple de la pièce défectueuse 
+
+Soit un lot de 4500 pièces 
+– 3700 bonnes 
+– 800 défectueuses 
+
+Réparties dans 4 boites 
+– B1 : 2000 pièces (1600 bonnes, 400 défectueuses) 
+– B2 : 500 pièces ( 300 bonnes, 200 défectueuses) 
+– B3 : 1000 pièces ( 900 bonnes, 100 défectueuses) 
+– B4 : 1000 pièces ( 900 bonnes, 100 défectueuses) 
+
+F = {tirer une pièce défectueuse}
+
+Théorème de Bayes
+- Question : • Un événement A peut résulter de plusieurs causes Ck (s’excluant mutuellement), 
+- Quelle est la probabilité de A connaissant – les probabilités élémentaires P(Ck) probabilités a priori – les probabilités conditionnelles de A à chaque cause Ck 
+- Réponse = Théorème des probabilités totales 
+
+
+Méthode : 
+On déduit des données d'entrées , les probabilités à priori qu'un pion pioché au hasard appartiennent à la boite 1, 2, 3 ou 4. Ces probabilités à posteriori correspondent directement aux fréquences du nb de pion par boite. 
+$P(C_1) = \frac{2000}{4500}$
+$P(C_2) = \frac{500}{4500}$
+$P(C_3) = \frac{1000}{4500}$
+$P(C_4) = \frac{1000}{4500}$
+
+On calcule ensuite les probabilités conditionnelles $P(A|C_K)$ c'est à dire les probabilités sachant que si la pièce vient de la boite K , elle soit défectueuse. On utilise pour cela les fréquences de pièces défectueuses au sein de chaque boite.
+
+$P(A|C_1) = \frac{1}{5}$
+$P(A|C_2) = \frac{2}{5}$
+$P(A|C_3) = 0.1$
+$P(A|C_4) = 0.1$
+
+On veut finalement calculer P(A), probabilité qu'une pièce tirée au hasard soit défectueuse. 
+
+$$P(A)= \sum^{K}_{k=1} P(C_K) \ * \ P(A|C_K) = 
+P(A|C_1) * P(C_1) \ + \ P(A|C_2) * P(C_2) \ + \ P(A|C_3) * P(C_3) \ + \ P(A|C_4) * P(C_4)$$
+
+soit 
+
+$$ P(A) = \frac{2000}{4500}*\frac{1}{5} \ + \ \frac{500}{4500}*\frac{2}{5} \ + \  \frac{1000}{4500}*0.1 \ + \ \frac{1000}{4500}*0.1 = 
+0.088 + 0.044 + 0.022 + 0.022 = 0.18
+$$
+
+La probabilité qu'une pièce tirée totalement au hasard soit défectueuse est de 18 %. 
+
+## Exemple appliqué : Patients malades
+
+On cherche a utiliser le théorème de Bayes et des probabilités totales dans le cadre d'une loi de probabilité. 
+On sait que le statut malade / non malade d'un patient impacte la teneur en globule rouge d'un individu : en effet, le taux de globules rouges, noté X, d'un individu malade suit une loi Normale de paramètre µ = 30 ; $\sigma$ = 5 et celui d'un individu non malade suit une loi normale de paramètres µ = 27 ; $\sigma$ = 5.
+
+On se demande si on peut savoir, à partir de ces connaissances biologiques, si un patient est malade, en connaissant seulement son taux de globules rouges ? Ou plutôt, quelle est sa probabilité d'appartenance au groupe "malade", selon X, son taux de globules rouges.
+
+On a : 
+- X = taux de globule rouge variable continue 
+- Y = état du patient, M=malade, NM=non malade 
+- De manière générale : 
+  – f(X|M) ~ N (30, s2=5) 
+  – f(X|NM) ~ N (27,s2=5) 
+- P(M) = 0.2 
+- P(NM) = 0.8 
+
+Un patient se présente avec X=24 … que vaut P(M|X=24) ?
+
+On sait que $P(M) = 0.2$ & $P(NM) = 0.8$ donc il y a K = 2 classes (M et NM) et $\pi_K=(M, NM) = (0.2,0.8)$ 
+
+
+$$ P(M|X=24) = \frac {P(M) \ * \ P(X|M) }{\sum^{K}_{k=1} \ P(K) \ * P(X|K) } = 
+\frac {P(M) \ * \ N(X,\mu_M,\sigma_M) }{\sum^{K}_{k=1} \ P(K) \ * N(X,\mu_K,\sigma_K) } =
+\frac {P(M) \ * \ N(X,\mu_M,\sigma_M) }{P(M) \ * N(X,\mu_M,\sigma_M)\ +\  P(NM) \ * N(X,\mu_{NM},\sigma_{NM})}
+$$
+
+Pour calculer $N(X,\mu_M,\sigma_M)$ ; on utilise la fonction de densité d'une loi normale (programmée dans le cours 4 par la fonction "densité"). Cette fonction de densité donne pour tout x suivant une loi normale $N(\mu,\sigma)$ la valeur sur l'axe des ordonnées  ('hauteur') => sur des portions de $x \in \ (a,b)$ on peut dériver f pour calculer l'aire sous la courbe => c'est la probabilité que X soit compris entre ces valeurs. 
+
+$f(X)=\frac{1}{\sigma \ * \sqrt(2\pi)} \ * \ \exp({-\frac{1}{2} (\frac{x - \ \mu}{\sigma})^2})$
+
+On a donc : 
+
+$$ P(M|X=24) = \frac {0.2 \ * \ 0.0388 }{0.2 \ * \ 0.0388 \ + \ 0.8 \ * \ 0.066  } = 0.12$$
+Lorsque le taux de globules rouges d'un patient vaut 24, la probabilité que le patient soit malade est de 12 %.
+Cet exemple permet d'illustrer l'application de ces théorèmes au lois continues.
+
+
+## Exemple du dé, 20 ans après
+
+Que vaut θ sachant que, le dé est tellement usé qu’il est impossible de différencier le 1du 2 (information cachée, variable latente) 
+et on est tombé 
+– x fois sur 1 ou 2 
+– α3 fois sur 3 
+– α4 fois sur 4.
+
+Le lien avec les algorithme d'optimisation d'Expectation - Maximisation sont : 
+Connaissant θ peut-on calculer la proportion de 1 (resp. de 2) à laquelle on peut raisonnablement s’attendre? (Expectation) 
+Connaissant la proportion de 1 et de 2 il est facile de calculer θ ? (Maximization)
+
+Commence-t-on par une étape d'E ? ou de M ?
+
+
+On en déduit que x = $\alpha_1 + \alpha_2$  (on tire x fois 1, ou 2, sans pouvoir identifier si c'est 1 ou 2)
+et $\frac{\alpha_1}{\alpha_2} = \frac{1/2}{\theta} = \frac{1}{2 \theta}$
+
+On isole $\alpha_1$ : $\alpha_1 = \frac{1/2 \ * \  x}{1/2 \ + \ \theta}$ et $\alpha_2$ : $\alpha_2 = \frac{\theta  x}{1/2 \ + \ \theta}$
+
+On peut faire quelques itérations semi - manuellement pour estimer $\theta$ à partir des valeurs de l'initialisation et des valeurs observées : 
+- x = 20, α3 = 10, α4 = 10 
+- Initialisons θ à 0: θ(0) = 0
+
+
+
+fonction de calcul de theta chapeau : 
+```{r}
+theta_hat <- function(a2, a3, a4){
+  t = (a2+a3)/(6(a2+a3+a4))
+  return(t)}
+```
+
+
