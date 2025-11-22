@@ -263,13 +263,56 @@ On peut faire quelques itérations semi - manuellement pour estimer $\theta$ à 
 - x = 20, α3 = 10, α4 = 10 
 - Initialisons θ à 0: θ(0) = 0
 
-
+fonction qui calcule $\alpha_2$
+```{r}
+alpha2 <- function(x, t){
+  a2 <- (t*x)/(0.5+t)
+  return(a2)}
+```
 
 fonction de calcul de theta chapeau : 
 ```{r}
 theta_hat <- function(a2, a3, a4){
-  t = (a2+a3)/(6(a2+a3+a4))
+  t = (a2+a3)/(6*(a2+a3+a4))
   return(t)}
 ```
+
+Initialisation 
+θ(0) = 0
+a2(0) = ?
+
+```{r}
+a2.0 <- alpha2(20,0) ; a2.0
+```
+
+puis : 
+```{r}
+t.1 <- theta_hat(0,10,10) 
+a2.1 <- alpha2(20, t.1)
+```
+
+et : 
+```{r}
+t.2 <- theta_hat(a2.1, 10, 10)
+a2.2 <- alpha2(20, t.2)
+```
+
+et : 
+```{r}
+t.3 <- theta_hat(a2.2, 10, 10)
+a2.3 <- alpha2(20, t.3)
+```
+
+et : 
+```{r}
+t.4 <- theta_hat(a2.3, 10, 10)
+a2.4 <- alpha2(20, t.4)
+```
+
+On voit que teta tend vers 0.094.
+
+On applique un algorithme d'optimisation qui alterne : 
+- une étape d'expectation qui attribue a chaque lancé où on a pioché 1;2 la probabilité que ce lancé appartienne à 1 ou à 2.
+- une étape de maximisation qui met à jour le paramètre $\theta$ à partir des probabilités d'appartenir à 1 ou à 2 (on veut s'arrêter quand on a estimé un paramètre le plus vraisemblable possible, il faudra donc définir un critère de convergence). 
 
 
