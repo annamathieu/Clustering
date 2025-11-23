@@ -312,8 +312,7 @@ res.HCPC1$desc.ind$para # individus les plus proches des centres des classes
 res.HCPC1$desc.ind$dist # individus les plus éloignés des centres des autres classes
 ```
 
-```{catdes(res.HCPC1$data.clust, num.var = 31) # on cherche à comprendre les clusters}
-```
+`{catdes(res.HCPC1$data.clust, num.var = 31) # on cherche à comprendre les clusters}`
 
 Avec la fonction "cat des" on réalise la description d'une variable
 catégorielle (la variable de classe) par les variables quantitatives. On
@@ -363,7 +362,7 @@ res.HCPC.3<-HCPC(res.pca.3,nb.clust=-1)
 res.HCPC.3$desc.var
 ```
 
-### Graphique 
+### Graphique
 
 ```{r}
 
