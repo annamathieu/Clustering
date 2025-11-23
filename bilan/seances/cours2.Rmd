@@ -147,7 +147,7 @@ le nombre d’individus pour réaliser la CAH.
 
 ## TD : étude appliqué sur le saumon
 
-```{r}
+```{r, echo = F}
 knitr::include_graphics('seances/images/saumon.png')
 ```
 
@@ -364,7 +364,92 @@ res.HCPC.3$desc.var
 
 ### Graphique
 
-```{r}
+```{r, message= F, warning=FALSE, fig.width=8 , fig.height= 6}
+
+library(factoextra)
+library(ggplot2)
+library(ggrepel)
+library(dplyr)
+
+###############################
+
+coord_ind <- res.pca.3$ind$coord
+clust     <- res.HCPC.3$data.clust$clust
+ind_sup   <- as.data.frame(res.pca.3$ind.sup$coord)
+rownames(ind_sup) <- dta_saumon_N$IKIDEN
+
+combined <- cbind(coord_ind,clust)
+
+# ajouter le bleu : les habitudes de consommation 
+quali_sup <- as.data.frame(res.pca.3$quali.sup$coord)
+
+# conserver que ceux qui sont intéressants 
+quali_sup <- quali_sup[c(236,226,188,167,224,63, 
+                         29,203,28,
+                         233,128,25),]
+
+col_ind_sup <- c("#E41A1C", "#377EB8", "#E41A1C", "#E41A1C", 
+             "#4DAF4A", "#4DAF4A", "#377EB8", "#E41A1C", 
+             "#E41A1C", "#E41A1C", "#E41A1C", "#E41A1C", 
+             "#E41A1C", "#377EB8", "#377EB8","#377EB8", 
+             "#377EB8", "#E41A1C", "#4DAF4A", "#E41A1C",
+             "#4DAF4A", "#E41A1C", "#4DAF4A", "#E41A1C", 
+             "#4DAF4A")
+
+col_quali_sup <- c(rep("red4",6), rep("blue4",3),rep("green4",3))
+
+p1 <- combined %>%
+  ggplot() +
+  aes(x = Dim.1, y = Dim.2, color = factor(clust)) +
+  geom_point(size = 0.8, alpha = 0.4) +
+  scale_color_manual(
+    values = c(
+      "1" = "#E41A1C",
+      "2" = "#377EB8",
+      "3" = "#4DAF4A"
+    ),
+    name = "Cluster"
+  ) + 
+  
+  # Points supplémentaires individus
+  geom_point(data = ind_sup, 
+             aes(x = Dim.1, y = Dim.2),
+             color = col_ind_sup,
+             size = 2, 
+             shape = 16) +
+  
+  geom_text_repel(data = ind_sup, 
+                  aes(label = row.names(ind_sup)),
+                  color = col_ind_sup, 
+                  size = 4) + 
+  
+  # Points supplémentaires qualitatifs
+  geom_point(data = quali_sup, 
+             aes(x = Dim.1, y = Dim.2),
+             color = col_quali_sup,
+             size = 2, 
+             shape = 16) +
+  
+  geom_text_repel(data = quali_sup, 
+                  aes(label = row.names(quali_sup)),
+                  color = col_quali_sup, 
+                  size = 2.8, 
+                  max.overlaps = 16) +
+  
+  labs(
+    title = "Clustering Saumon",
+    x = "Dimension 1",
+    y = "Dimension 2"
+  ) +
+  
+  theme(
+    legend.position = "right",
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    axis.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank()
+  )
+
+p1
 
 ```
 
