@@ -18,7 +18,7 @@ La forme de la distribution (observée sur les graphiques/diapos) nous renseigne
 
 On regarde "depuis le haut" la forme de la représentation du lien x1 et x2, pour savoir quelle structure aura la matrice de variance - covariance. Si il n'y a aucun lien entre x1 et x2, alors les variables sont indépendantes, dont leur coefficients de corrélation sont faibles voire nuls, donc la matrice de variance - covariance a presque aucun élément donnant du poids en dehors de la diagonale : on dit que "elle ne charge pas hors diagonale". Au contraire, si x1 et x2 sont fortement corrélés, alors les éléments hors diagonales (coefficients de corrélation entre x1 et x2) seront élevés (corrélation +), ou faible (corrélation -). 
 
-```{r}
+```{r, echo = F}
 knitr::include_graphics('seances/images/LM1.png')
 ```
 
@@ -27,14 +27,14 @@ l’autre, et qu’il n’y a pas de corrélation entre les variables. :
 Situation d’indépendance (comme en ACP, lorsque les axes sont
 orthogonaux et expliquent chacun la même part de variabilité). 
 
-```{r}
+```{r, echo = F}
 knitr::include_graphics('seances/images/LM2.png')
 ```
 
 - Corrélation positive : Quand les données s’étirent le long d’une diagonale ascendante (de bas-gauche à haut-droit), cela indique une corrélation positive entre x et y. Par définition du coefficient de corrélation, les covariances (termes hors diagonale de la matrice) sont positives. Quand x augmente, y augmente aussi. Diapo 101 – Déplacement du vecteur des moyennes : Le centre de la distribution (μ1,μ2) s’est déplacé. Cela se traduit par un vecteur moyenne non nul (les valeurs de µ sont positives ou différentes de zéro). 
 
-```{r}
-knitr::include_graphics('seances/images/LM3.png')
+```{r, echo = F}
+knitr::include_graphics('seances/images/LM4.png')
 ```
 
 Diapo 103 – Corrélation négative : La forme de la distribution s’étire le long d’une diagonale
