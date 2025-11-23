@@ -3,52 +3,49 @@ title: "Bilan de la séance 5 : Variables latentes et variables cachées"
 date: "`r Sys.Date()`"
 output: html_document
 ---
+
 ## Introduction
 
-Dans les modèles à variables latentes, on suppose que chaque observation \(X_i\) provient d’une **classe cachée** (ou variable latente) notée \(Z_i\).
+Dans les modèles à variables latentes, on suppose que chaque observation $X_i$ provient d’une **classe cachée** (ou variable latente) notée $Z_i$.
 
-On considère que :
-
-$$
-Z_i \sim \text{Multinomial}(\pi_1, \ldots, \pi_K)
-$$
+On considère que : $Z_i \sim \text{Multinomial}(\pi_1, \ldots, \pi_K)$
 
 où :
 
-- \(K\) est le nombre de classes (ou composantes du mélange),
-- \(\pi_k\) est la probabilité d’appartenir à la classe \(k\), avec :
+-   $K$ est le nombre de classes (ou composantes du mélange),
+-   $\pi_k$ est la probabilité d’appartenir à la classe $k$, avec :
 
 $$
 \sum_{k=1}^K \pi_k = 1
 $$
 
-- \(Z_{ik} = 1\) si l'individu \(i\) appartient à la classe \(k\), sinon \(Z_{ik} = 0\).
+-   $Z_{ik} = 1$ si l'individu $i$ appartient à la classe $k$, sinon $Z_{ik} = 0$.
 
----
+------------------------------------------------------------------------
 
 ## Étape 1 : Modélisation probabiliste
 
-L’objectif de cette première étape est de **décrire le mécanisme probabiliste** qui permet de générer les observations lorsque l’on suppose l’existence d’une **variable latente** indiquant l’appartenance de chaque individu à une classe cachée.  
+L’objectif de cette première étape est de **décrire le mécanisme probabiliste** qui permet de générer les observations lorsque l’on suppose l’existence d’une **variable latente** indiquant l’appartenance de chaque individu à une classe cachée.\
 Cette variable latente représente l’idée que les données proviennent d’un **mélange de plusieurs sous-populations**, chacune ayant ses propres caractéristiques statistiques.
 
 Ainsi, le modèle repose sur deux éléments essentiels :
 
-1. **la probabilité d’appartenir à chaque classe**, définie par les poids du mélange ;
-2. **la distribution des observations conditionnellement à cette classe**, ici modélisée par une loi gaussienne.
+1.  **la probabilité d’appartenir à chaque classe**, définie par les poids du mélange ;
+2.  **la distribution des observations conditionnellement à cette classe**, ici modélisée par une loi gaussienne.
 
----
+------------------------------------------------------------------------
 
 ### Distribution de la variable latente
 
-On introduit une variable latente \(Z\), souvent représentée comme un vecteur binaire \((Z_1, \ldots, Z_K)\), où :
+On introduit une variable latente $Z$, souvent représentée comme un vecteur binaire $(Z_1, \ldots, Z_K)$, où :
 
-- \(Z_k = 1\) signifie que l’individu appartient à la classe \(k\),
-- \(Z_k = 0\) signifie qu’il n’y appartient pas.
+-   $Z_k = 1$ signifie que l’individu appartient à la classe $k$,
+-   $Z_k = 0$ signifie qu’il n’y appartient pas.
 
 Une seule composante est égale à 1, les autres valent 0 : l’individu appartient **exactement à une seule classe**.
 
-La variable \(Z\) suit donc une **loi multinomiale à un seul tirage**, paramétrée par les poids \(\pi_k\).  
-Les \(\pi_k\) représentent les proportions de chaque classe dans la population :
+La variable $Z$ suit donc une **loi multinomiale à un seul tirage**, paramétrée par les poids $\pi_k$.\
+Les $\pi_k$ représentent les proportions de chaque classe dans la population :
 
 $$
 p(z) = \prod_{k=1}^{K} \pi_k^{z_k}
@@ -56,30 +53,26 @@ $$
 
 Cette écriture compacte traduit le fait que :
 
-- si \(z_k = 1\), on récupère \(\pi_k\),
+-   si $z_k = 1$, on récupère $\pi_k$,
 
-- sinon, \(\pi_k^{0} = 1\) et n’influence pas la probabilité.
+-   sinon, $\pi_k^{0} = 1$ et n’influence pas la probabilité.
 
-Ainsi, la distribution de \(Z\) modélise **la structure invisible** qui génère les données.
+Ainsi, la distribution de $Z$ modélise **la structure invisible** qui génère les données.
 
----
+------------------------------------------------------------------------
 
-### Distribution conditionnelle : comment générer une observation \(x\) ?
+### Distribution conditionnelle : comment générer une observation $x$ ?
 
-Une fois la classe latente déterminée, l’observation \(x\) est générée selon une distribution propre à cette classe.
+Une fois la classe latente déterminée, l’observation $x$ est générée selon une distribution propre à cette classe.
 
-On suppose que chaque classe \(k\) suit une loi normale multivariée :
+On suppose que chaque classe $k$ suit une loi normale multivariée :
 
-- moyenne \(\mu_k\),
-- matrice de covariance \(\Sigma_k\).
+-   moyenne $\mu_k$,
+-   matrice de covariance $\Sigma_k$.
 
-Autrement dit :
+Autrement dit : $p(x \mid z_k = 1) = \mathcal{N}(x \mid \mu_k, \Sigma_k)$
 
-$$
-p(x \mid z_k = 1) = \mathcal{N}(x \mid \mu_k, \Sigma_k)
-$$
-
-Si l’on considère l’expression en fonction du vecteur \(z\), on peut écrire :
+Si l’on considère l’expression en fonction du vecteur $z$, on peut écrire :
 
 $$
 p(x \mid z) 
@@ -88,40 +81,39 @@ p(x \mid z)
 \mathcal{N}(x \mid \mu_k, \Sigma_k)^{z_k}
 $$
 
-Cette forme s’interprète exactement comme pour \(p(z)\) :
+Cette forme s’interprète exactement comme pour $p(z)$ :
 
-- seule la gaussienne correspondant à la classe active (\(z_k = 1\)) intervient,
-- les autres termes, élevés à la puissance 0, disparaissent.
+-   seule la gaussienne correspondant à la classe active ($z_k = 1$) intervient,
+-   les autres termes, élevés à la puissance 0, disparaissent.
 
----
+------------------------------------------------------------------------
 
-### Distribution marginale de \(x\) : le mélange gaussien
+### Distribution marginale de $x$ : le mélange gaussien
 
-Comme la variable latente n’est pas observée, on s’intéresse à la probabilité marginale d’obtenir \(x\).  
-On somme donc sur toutes les configurations possibles de \(z\).  
+Comme la variable latente n’est pas observée, on s’intéresse à la probabilité marginale d’obtenir $x$.\
+On somme donc sur toutes les configurations possibles de $z$.\
 Cela conduit naturellement au modèle de **mélange de gaussiennes** :
 
 $$
 p(x) 
 = 
-\sum_{z} p(z) \, p(x \mid z)
+\sum_{z} p(z) \,* \ p(x \mid z)
 = 
 \sum_{k=1}^K \pi_k \, \mathcal{N}(x \mid \mu_k, \Sigma_k)
 $$
 
 Cette expression montre que la distribution globale des données est une **combinaison pondérée** des distributions de chaque classe.
 
-- Les **\(\pi_k\)** pondèrent l’importance relative de chaque composante.  
-- Les **gaussiennes** \(\mathcal{N}(x \mid \mu_k, \Sigma_k)\) décrivent les profils propres aux sous-populations.
+-   Les $\pi_k$ pondèrent l’importance relative de chaque composante.\
+-   Les **gaussiennes** $\mathcal{N}(x \mid \mu_k, \Sigma_k)$ décrivent les profils propres aux sous-populations.
 
 C’est ce modèle qui sera estimé par l’algorithme EM dans les étapes suivantes.
 
----
-
+------------------------------------------------------------------------
 
 ## Étape 2 : Expectation (E-step)
 
-L’objectif de l’étape E est de calculer, pour chaque observation \(x\), la **probabilité a posteriori** qu’elle appartienne à chacune des \(K\) composantes du mélange.
+L’objectif de l’étape E est de calculer, pour chaque observation $x$, la **probabilité a posteriori** qu’elle appartienne à chacune des $K$ composantes du mélange.
 
 On note :
 
@@ -129,11 +121,11 @@ $$
 \gamma(z_k) = p(z_k = 1 \mid x)
 $$
 
-Cela représente la probabilité pour que l’individu \(x\) appartienne à la classe \(k\).
+Cela représente la probabilité pour que l’individu $x$ appartienne à la classe $k$.
 
 ### Application du théorème de Bayes
 
-Comme \(Z_k\) indique l’appartenance à la classe \(k\), on applique le théorème de Bayes :
+Comme $Z_k$ indique l’appartenance à la classe $k$, on applique le théorème de Bayes :
 
 $$
 p(z_k = 1 \mid x)
@@ -147,8 +139,8 @@ $$
 
 Dans un modèle de mélange gaussien, on a :
 
-- \(p(z_k = 1) = \pi_k\), le poids de la composante \(k\),
-- \(p(x \mid z_k = 1) = \mathcal{N}(x \mid \mu_k, \Sigma_k)\), la gaussienne associée à la classe \(k\).
+-   $p(z_k = 1) = \pi_k$, le poids de la composante $k$,
+-   $p(x \mid z_k = 1) = \mathcal{N}(x \mid \mu_k, \Sigma_k)$, la gaussienne associée à la classe $k$.
 
 On obtient alors :
 
@@ -164,17 +156,18 @@ p(z_k = 1 \mid x)
 }
 $$
 
-Cette étape correspond à l’**étiquetage probabiliste** :
+Cette étape correspond à l’**étiquetage probabiliste** (soft asignment) :
 
-- si \(\gamma(z_k)\) est proche de 1 → l’observation appartient presque sûrement à la classe \(k\),
-- si les \(\gamma(z_k)\) sont proches pour plusieurs \(k\) → l’observation est « entre » différentes classes.
+-   si $\gamma(z_k)$ est proche de 1 → l’observation appartient presque sûrement à la classe $k$,
+-   si les $\gamma(z_k)$ sont proches pour plusieurs $k$ → l’observation est « entre » différentes classes.
+-   pour un individu i $\sum^{K}_{k=1} \gamma{(z_{ik})} = 1$
 
----
+------------------------------------------------------------------------
 
 ## Étape 3 : Maximisation (M-step) — mise à jour des paramètres
 
-L’objectif de l’étape M est de maximiser la **log-vraisemblance** du modèle en utilisant les \(\gamma(z_{ik})\) calculées à l’étape E.  
-On met à jour les paramètres du mélange gaussien : \(\pi_k, \mu_k, \Sigma_k\).
+L’objectif de l’étape M est de maximiser la **log-vraisemblance** du modèle en utilisant les $\gamma(z_{ik})$ calculées à l’étape E.\
+On met à jour les paramètres du mélange gaussien : $\pi_k, \mu_k, \Sigma_k$.
 
 ### Log-vraisemblance
 
@@ -198,9 +191,9 @@ $$
 N_k = \sum_{i=1}^n \gamma(z_{ik})
 $$
 
-Cela correspond au **nombre effectif** d’observations assignées à la classe \(k\).
+Cela correspond au **nombre effectif** d’observations assignées à la classe $k$.
 
-### Mise à jour des moyennes \(\mu_k\)
+### Mise à jour des moyennes $\mu_k$
 
 La nouvelle moyenne estimée de chaque composante est :
 
@@ -213,9 +206,9 @@ N_k
 }
 $$
 
-### Mise à jour des matrices de covariance \(\Sigma_k\)
+### Mise à jour des matrices de covariance $\Sigma_k$
 
-La nouvelle matrice de covariance de la classe \(k\) s’écrit :
+La nouvelle matrice de covariance de la classe $k$ s’écrit :
 
 $$
 \Sigma_k^{\text{new}} =
@@ -226,29 +219,29 @@ N_k
 }
 $$
 
-### Mise à jour des poids \(\pi_k\)
+### Mise à jour des poids $\pi_k$
 
-Comme les poids doivent vérifier \(\sum_{k=1}^K \pi_k = 1\), on maximise la log-vraisemblance sous contrainte à l’aide d’un Lagrangien.  
-En dérivant par rapport à \(\pi_k\), on obtient :
+Comme les poids doivent vérifier $\sum_{k=1}^K \pi_k = 1$, on maximise la log-vraisemblance sous contrainte à l’aide d’un Lagrangien.\
+En dérivant par rapport à $\pi_k$, on obtient :
 
 $$
 \pi_k^{\text{new}} = \frac{N_k}{n}
 $$
 
----
+------------------------------------------------------------------------
 
 ## Application : classification de données fonctionnelles
 
-On s’intéresse ici à la classification de **données fonctionnelles** :  
+On s’intéresse ici à la classification de **données fonctionnelles** :\
 chaque individu correspond à une **courbe mesurée dans le temps**.
 
-- Chaque ligne représente un spectre ou un signal.  
-- Chaque colonne correspond à une mesure de ce signal à un instant donné.  
-- Toutes les courbes sont mesurées avec le **même pas de temps**.
+-   Chaque ligne représente un spectre ou un signal.\
+-   Chaque colonne correspond à une mesure de ce signal à un instant donné.\
+-   Toutes les courbes sont mesurées avec le **même pas de temps**.
 
 L’objectif est de **classifier ces fonctions** en identifiant des formes ou profils similaires parmi les courbes.
 
----
+------------------------------------------------------------------------
 
 ## 1. Visualisation des courbes
 
@@ -275,18 +268,17 @@ matplot(seq_t,t_signal,type="l",lwd=0.1,col="blue",lty=1,
 grid()
 ```
 
-
 ## 2. Tentative de classification directe par k-means
 
-Une première idée naturelle est d’appliquer un k-means directement sur les données brutes, en considérant chaque courbe comme un point dans un espace de grande dimension (ici, ~100 dimensions).
+Une première idée naturelle est d’appliquer un k-means directement sur les données brutes, en considérant chaque courbe comme un point dans un espace de grande dimension (ici, \~100 dimensions).
 
 Cependant, cette approche fonctionne en général mal pour les données fonctionnelles :
 
-- Les courbes sont très corrélées dans le temps → forte redondance de l’information.
+-   Les courbes sont très corrélées dans le temps → forte redondance de l’information.
 
-- Le k-means utilise une distance euclidienne standard, peu adaptée à des objets « courbes ».
+-   Le k-means utilise une distance euclidienne standard, peu adaptée à des objets « courbes ».
 
-- Le bruit local ou de petites oscillations peuvent dominer la distance, alors que l’on souhaite capturer plutôt la forme globale (croissance, décroissance, plateau, etc.).
+-   Le bruit local ou de petites oscillations peuvent dominer la distance, alors que l’on souhaite capturer plutôt la forme globale (croissance, décroissance, plateau, etc.).
 
 ```{r, message=FALSE, warning=FALSE}
 #k-means sur les données brutes
@@ -320,14 +312,14 @@ On observe que les clusters obtenus sont peu interprétables et ne correspondent
 
 ## 3. Identification de points d'inflexion et modélisation pièce par pièce
 
-En observant les courbes, on remarque que leur structure change à deux instants caractéristiques : 
+En observant les courbes, on remarque que leur structure change à deux instants caractéristiques :
 
-- 1/3 du temps
-- 2/3 du temps 
+-   1/3 du temps
+-   2/3 du temps
 
-Ces points correspondent à des inflexions (changement de tendance : croissance, décroissance). C'est pour cela que nous allons faire une modélisation segment par segment. 
+Ces points correspondent à des inflexions (changement de tendance : croissance, décroissance). C'est pour cela que nous allons faire une modélisation segment par segment.
 
-L'idée est de résumer chaque segment par un coefficient directeur obtenu via une régression linéaire. 
+L'idée est de résumer chaque segment par un coefficient directeur obtenu via une régression linéaire.
 
 ```{r}
 # Séparation des données en 3 segments : 1/3, 2/3 et fin
@@ -377,9 +369,9 @@ colnames(extraction_features) <- c("pente_seg1", "pente_seg2", "pente_seg3")
 summary(extraction_features)
 ```
 
-On obtient ainsi une matrice 150 x 3 qui résume chaque courbe par trois nombres représentant les tendances locales. 
+On obtient ainsi une matrice 150 x 3 qui résume chaque courbe par trois nombres représentant les tendances locales.
 
-## 4.classification finale des courbes par modèle de mélange gaussien
+## 4. Classification finale des courbes par modèle de mélange gaussien
 
 Une fois ces paramètres extraits, on peut appliquer une méthode de clustering adapté : mclust(), un modèle de mélange gaussien.
 
@@ -424,8 +416,8 @@ theme(legend.position = "none")
 
 On obtient ainsi une classification des courbes basée sur leurs profils fonctionnels (pentes des segments), qui est beaucoup mieux interprétables qu'un k-means appliqué directement sur les données brutes.
 
-Le premier cluster a une pente positive sur le premier segment puis une transition vers une pente plus faible ou nulle et une intensité élevée en fin de signal. 
+Le premier cluster a une pente positive sur le premier segment puis une transition vers une pente plus faible ou nulle et une intensité élevée en fin de signal.
 
-Le second cluster a une pente positive dans les trois segments tout ayant une amplitude plus faible que le cluster 1. 
+Le second cluster a une pente positive dans les trois segments tout ayant une amplitude plus faible que le cluster 1.
 
 Le cluster 3 a une première pente légèrement négative ou stable, une forte pente négatuve ensuite et une remontée très forte dans le dernier segment.
