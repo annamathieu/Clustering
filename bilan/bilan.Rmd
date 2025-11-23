@@ -16,12 +16,11 @@ output:
       bootswatch: flatly
       bg: aliceblue
       fg: '#000000'
-      primary: '#F2186E'
+      primary: '#6FA8DC'
       base_font: Lato
       heading_font: Playfair Display
       code_font: Fira Code
     tabset: true
-    
 ---
 
 
