@@ -23,14 +23,12 @@ output:
     tabset: true
 ---
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = F, warning = F, fig.height=3, fig.width=4)
 ```
 
-
 ```{r, include = FALSE}
-setwd("C:/documents/Agrocampus/M2/Classification_Non_Supervisee/RmD/Clustering")
+setwd("E:/IMPORTANT/ECOLE/INH/M2/COURS/Sébastien Lé/Classification non supervisée/Clustering")
 
 sections.path <- file.path(rprojroot::find_root("Clustering.Rproj"),
                            "bilan",
@@ -40,38 +38,43 @@ r.files.vec <- r.files.vec[grepl(".Rmd", r.files.vec)]
 ```
 
 # Introduction et overview
+
 ```{r child = 'seances/intro.Rmd'}
 
 ```
 
-
 # Seance 1
+
 ```{r child = 'seances/cours1.Rmd'}
 
 ```
 
-# Seance 2 
+# Seance 2
+
 ```{r child = 'seances/cours2.Rmd'}
 
 ```
 
 # Seance 3
+
 ```{r child = 'seances/cours3.Rmd'}
 
 ```
 
-# Seance 4 
+# Seance 4
+
 ```{r child = 'seances/cours4.Rmd'}
 
 ```
 
-# Seance 5 
+# Seance 5
+
 ```{r child = 'seances/cours5.Rmd'}
 
 ```
 
 # Seance 6
+
 ```{r child = 'seances/cours6.Rmd'}
 
 ```
-

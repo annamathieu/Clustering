@@ -2,6 +2,610 @@
 title: "Bilan de la séance 6 : Topic Modelling"
 date: "`r Sys.Date()`"
 output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
-Le cours 6 est super! il faut le faire quand même.
+## Introduction au Topic Modeling
+
+Le topic modeling est une méthode de traitement automatique du langage
+(NLP) permettant d’explorer de manière non supervisée un ensemble de
+textes (documents). L’objectif est d’identifier les grands thèmes
+(topics) présents dans un corpus, chacun étant représenté par une
+distribution de mots caractéristique.Les topics ne sont pas connus à
+l’avance.
+
+Le cadre théorique le plus utilisé pour cela est le modèle LDA (Latent
+Dirichlet Allocation), proposé par Blei et al.
+
+------------------------------------------------------------------------
+
+## Définir l’objet statistique : le document
+
+Première question clé : comment modélise-t-on un document ?
+
+Dans LDA, un document est représenté comme un mélange de plusieurs
+topics, chaque topic contribuant avec une proportion différente. Un
+document n’est pas rattaché à un seul topic, mais plutôt à une
+distribution de topics.
+
+-   Chaque topic est lui-même une distribution de mots.
+-   Chaque document possède sa propre distribution de topics.
+-   Un même mot peut être généré par différents topics selon sa
+    probabilité d’appartenance.
+
+Cette conception est comparable à un modèle de mélange (comme le mélange
+gaussien) mais ici les composantes sont des distributions de mots et non
+des distributions continues.
+
+------------------------------------------------------------------------
+
+## Le processus génératif d’un document (LDA)
+
+Pour comprendre comment la machine retrouve les topics, il faut repartir
+du processus génératif :\
+on cherche à comprendre comment un document pourrait être généré si les
+topics existaient déjà.
+
+LDA repose sur un modèle hiérarchique à trois niveaux :
+
+$$
+\text{Documents} \;\longrightarrow\; \text{Topics} \;\longrightarrow\; \text{Mots}
+$$
+
+### Hyperparamètres
+
+-   $K$ : nombre de topics
+-   $\alpha$ : paramètre de Dirichlet qui contrôle la richesse en topics
+    des documents\
+    (document monotopique $\alpha$ faible ; document polytopique
+    $\Rightarrow \alpha$ élevé)
+-   $\beta$ : paramètre de Dirichlet qui contrôle la richesse en mots
+    des topics\
+    (topic dominé par quelques mots $\beta$ faible ; topic riche en
+    vocabulaire $\Rightarrow \beta$ élevé)
+
+### Processus génératif complet
+
+1.  **Génération des** $K$ topics
+
+Pour chaque topic $k = 1, \dots, K$ :
+
+$$
+\phi_k \mid \beta \sim \text{Dirichlet}(\beta)
+$$
+
+$\phi_k$ représente la distribution de mots associée au topic $k$.
+
+2.  **Génération d’un document**
+
+Pour chaque document $d$ :
+
+-   Tirer une distribution de topics pour ce document :
+
+$$
+\theta_d \mid \alpha \sim \text{Dirichlet}(\alpha)
+$$
+
+-   Pour chaque mot du document (position $n = 1, \dots, N_d$) :
+
+    -   Tirer un topic selon la distribution de topics du document :
+
+    $$
+    z_{dn} \mid \theta_d \sim \text{Multinomial}\bigl(1, \theta_d\bigr)
+    $$
+
+    -   Tirer un mot selon la distribution propre à ce topic :
+
+    $$
+    w_{dn} \mid z_{dn}, \{\phi_k\} \sim \text{Multinomial}\bigl(1, \phi_{z_{dn}}\bigr)
+    $$
+
+En résumé, on :
+
+-   fixe les topics via les distributions de mots$\phi_k$,
+-   fixe, pour chaque document, une distribution de topics$\theta_d$,
+-   génère ensuite chaque mot en choisissant d’abord un topic, puis un
+    mot dans la distribution de ce topic.
+
+------------------------------------------------------------------------
+
+## Pourquoi une loi de Dirichlet ?
+
+La loi de Dirichlet est utilisée dans LDA comme distribution a priori
+sur les proportions.
+
+### Cas simple : $K = 2$ topics
+
+Lorsque le nombre de topics vaut $K = 2$, la loi de Dirichlet se réduit
+à une loi Bêta :
+
+$$
+\text{Dirichlet}(\alpha_1, \alpha_2) \equiv \text{Beta}(\alpha_1, \alpha_2)
+$$
+
+La loi Bêta décrit une **distribution de probabilité sur des
+proportions**.
+
+Exemples de proportions de topics dans deux documents :
+
+-   Document 1 : $52\%$ Topic 1, $48\%$ Topic 2\
+-   Document 2 : $51\%$ Topic 1, $49\%$ Topic 2
+
+La loi Bêta (ou Dirichlet dans le cas général) permet de modéliser cette
+**variabilité d’un document à l’autre**.
+
+### Cas général : $K > 2$
+
+Lorsque le nombre de topics dépasse deux, la loi de Dirichlet généralise
+naturellement la loi Bêta au cas **multivarié** :
+
+$$
+\boldsymbol{\theta} = (\theta_1, \dots, \theta_K) \sim \text{Dirichlet}(\alpha_1, \dots, \alpha_K)
+$$
+
+Elle décrit alors une **distribution de probabilité sur une distribution
+multinomiale**, c’est-à-dire un vecteur de proportions qui doit
+satisfaire :
+
+$$
+\theta_k \ge 0 \quad \text{et} \quad \sum_{k=1}^K \theta_k = 1.
+$$
+
+Ainsi, la Dirichlet est la loi naturelle pour modéliser les proportions
+de topics dans un document lorsqu’il y a $K$ catégories possibles.
+
+------------------------------------------------------------------------
+
+## LDA : un modèle — pas une méthode de calcul
+
+Jusqu’ici, tout ce que nous avons décrit (proportions de topics,
+proportions de mots, rôle de la Dirichlet, processus génératif)
+correspond **au modèle LDA lui-même**.\
+LDA explique comment les documents auraient pu être générés si les
+topics existaient déjà.
+
+Autrement dit :
+
+-   **LDA définit les objets statistiques** :
+
+    -   les distributions de topics $\theta_d$,
+
+    -   les distributions de mots $\phi_k$,
+
+    -   les topics associés à chaque mot $z_{dn}$.
+
+-   **Mais LDA ne dit absolument pas comment retrouver ces quantités à
+    partir des données observées.**\
+    Le modèle dit **“voici ce qui existe”** pas “voici comment
+    l’estimer”.
+
+On connaît les mots $w_{dn}$​, mais on ne connaît rien des variables
+latentes $z_{dn}$, $\theta_d$ et $\phi_k$. Ce problème est difficile car
+il implique d’intégrer ou maximiser des distributions multinomiales
+hiérarchiques (avec Dirichlet), ce qui est intractable analytiquement.
+
+Ainsi :
+
+**LDA = modèle statistique latent –\> il faut une méthode d’inférence
+pour le rendre utilisable**
+
+### Pourquoi faut-il une méthode d’inférence ?
+
+Les quantités importantes (topics, assignation des mots, proportions de
+topics) sont :
+
+-   non observées
+
+-   dépendantes les unes des autres
+
+-   imbriquées hiérarchiquement
+
+Le modèle complet implique une intégrale multidimensionnelle impossible
+à résoudre à la main. On doit donc approximer la distribution a posteriori.
+
+Plusieurs méthodes existent :
+
+-   Excectation-Maximization
+
+-   **Gibbs Sampling**
+
+-   etc
+
+**Gibbs Sampling est simplement une méthode parmi d’autres pour
+approximer la solution du modèle LDA.**
+
+------------------------------------------------------------------------
+
+## Gibbs Sampling
+
+Une fois le modèle spécifié, il reste à estimer les topics et la
+répartition des mots dans ces topics.\
+L’algorithme EM classique n’est pas adapté ici, car on ne maximise pas
+directement une fonction de vraisemblance simple.
+
+À la place, on utilise souvent un algorithme de type Gibbs sampling
+(échantillonnage de Gibbs), qui cherche un état stable dans lequel les
+mots changent peu de topic.
+
+L’idée est la suivante : on met à jour, un par un, les topics latents
+$z_{dn}$ associés à chaque mot $w_{dn}$, en conditionnant sur tous les
+autres.
+
+On note :
+
+-   $z_{dn}$ : topic latent du $n$-ième mot du document $d$\
+-   $w_{dn}$ : mot observé à cette position\
+-   $v$ : l’index du mot $w_{dn}$ dans le vocabulaire\
+-   $n_{dk}^{-dn}$ : nombre de mots du document $d$ affectés au topic
+    $k$ (en excluant la position $(d,n)$)\
+-   $n_{kv}^{-dn}$ : nombre d’occurrences du mot $v$ dans le topic $k$
+    (en excluant la position $(d,n)$)\
+-   $n_k^{-dn}$ : nombre total de mots affectés au topic $k$ (en
+    excluant la position $(d,n)$)
+
+La probabilité conditionnelle d’affecter le mot $w_{dn}$ au topic $k$
+s’écrit alors, à une constante de normalisation près :
+
+$$
+p(z_{dn} = k \mid \mathbf{z}_{-dn}, \mathbf{w}, \alpha, \beta)
+\propto
+\underbrace{\bigl(n_{dk}^{-dn} + \alpha_k\bigr)}_{\text{cohérence document}}
+\;\times\;
+\underbrace{
+\frac{n_{kv}^{-dn} + \beta_v}{n_k^{-dn} + \sum_{v'} \beta_{v'}}
+}_{\text{cohérence topic}}
+$$
+
+Cette formule traduit exactement les deux critères intuitifs :
+
+-   **Cohérence au niveau du document** :\
+    plus le topic $k$ est fréquent dans le document $d$ (grand
+    $n_{dk}^{-dn}$), plus il est probable que le mot courant appartienne
+    à ce topic.
+
+-   **Cohérence au niveau du topic** :\
+    plus le mot $v$ est fréquent dans le topic $k$ (grand
+    $n_{kv}^{-dn}$), plus il est probable que ce mot soit généré par ce
+    topic.
+
+### Schéma de l’algorithme de Gibbs
+
+Pour chaque itération :
+
+1.  Pour chaque position $(d,n)$ :
+    -   On retire temporairement le mot de son topic actuel (on met à
+        jour les $n_{dk}^{-dn}$, $n_{kv}^{-dn}$, $n_k^{-dn}$).
+    -   On calcule la probabilité d’appartenance à chaque topic $k$ avec
+        la formule ci-dessus.
+    -   On ré-affecte le mot à un topic en tirant selon ces
+        probabilités.
+2.  On répète ce processus pour tous les mots de tous les documents.
+
+Après un certain nombre d’itérations, les assignments de topics se
+stabilisent statistiquement : on obtient alors des topics cohérents et
+des distributions de topics par document exploitables.
+
+------------------------------------------------------------------------
+
+## Comment la machine réalise-t-elle le topic modeling ?
+
+Dans la pratique, on ne connaît ni les topics ni les paramètres. La
+machine doit donc reconstruire les topics à partir des mots via un
+algorithme d’inférence.
+
+### Exemple avec la méthode de Gibbs:
+
+doc 1 : banque prêt dette argent
+
+doc 2 : banque investit Etat dette
+
+doc 3 : poisson bon santé
+
+doc 4 : manger poisson bon santé
+
+Initialisation :
+
+\- Ici K = 2 classes
+
+\- Identification pour chaque texte des mots clés
+
+\- Attribution au hasard de chaque mot au topic K1 et au topic K2
+
+```{r}
+test1 = c("banque", "prêt", "dette", "argent")
+test2 = c("banque", "prêt", "investit", "Etat")
+test3 = c("poisson", "bon", "manger")
+test4 = c("manger", "poisson", "bon", "santé")
+
+origin <- function(teste,nb) {
+  for (i in 1:length(teste)) {
+    teste[i] <- paste0(teste[i],nb)
+    
+  }
+  return(teste)
+}
+
+teste1 <- origin(test1,1)
+teste2 <- origin(test2,2)
+teste3 <- origin(test3,3)
+teste4 <- origin(test4,4)
+
+words <- c(teste1, teste2, teste3, teste4)
+words
+```
+
+On fixe K=2 et on assigne aléatoirement les mots aux topics.
+
+```{r}
+random <- function(teste) {
+  T1 <- NULL
+  T2 <- NULL
+  
+  words <- sample(teste, replace = F)
+  
+  print(words)
+  
+  c <- length(words)/2
+  
+  T1 <- words[1:c]
+  T2 <- words[-(1:c)]
+  
+  return(list(T1=T1,T2=T2))
+}
+
+res.T1T2 <- random(words)
+
+T1<- res.T1T2$T1
+T2<- res.T1T2$T2
+
+```
+
+```{r}
+T1
+T2
+```
+
+### Exemple : mise à jour d’un mot par Gibbs – cas de `banque1`
+
+On considère deux topics initiaux :
+
+-   $T_1 = \{\text{poisson3}, \text{bon3}, \text{argent1}, \text{investit2}, \text{bon4}, \text{prêt1}, \text{poisson4}\}$
+-   $T_2 = \{\text{manger4}, \text{banque2}, \text{Etat2}, \text{dette1}, \text{santé4}, \text{prêt2}, \text{banque1}, \text{manger3}\}$
+
+On souhaite mettre à jour l’affectation du mot **`banque1`**,
+actuellement dans T2.
+
+On découpe ce mot en deux parties :
+
+-   la racine (le mot lexical) : $\text{banque}$
+-   l’identifiant de document : $1$ (le mot appartient au document 1)
+
+#### 1. Affinité de `banque1` avec le topic T1
+
+On calcule deux composantes :
+
+1.  **Affinité “document”** : nombre de mots de T1 provenant du même
+    document (doc 1).\
+    Dans T1, les mots issus du document 1 sont :
+    $\{\text{argent1}, \text{prêt1}\}$, soit 2 mots.\
+    On ajoute 1 comme pseudo-compte (lissage) :
+
+    $$
+    \text{count\_doc}_{T_1} = 1 + 2 = 3
+    $$
+
+2.  **Affinité “topic”** : nombre de mots de T1 partageant la même
+    racine “banque”.\
+    Dans T1, aucune racine n’est égale à “banque”, donc :
+
+    $$
+    \text{count\_word}_{T_1} = 1 + 0 = 1
+    $$
+
+L’affinité totale avec T1 est alors :
+
+$$
+\text{affinité}(K_1) = \text{count\_doc}_{K_1} \times \text{count\_word}_{K_1}
+= 3 \times 1 = 3.
+$$
+
+------------------------------------------------------------------------
+
+#### 2. Affinité de `banque1` avec le topic T2
+
+On retire temporairement `banque1` de T2 pendant le calcul.
+
+1.  **Affinité “document”** : nombre de mots de T2 provenant du doc 1.\
+    Dans T2 sans `banque1`, on trouve $\{\text{dette1}\}$, soit 1 mot.
+    On ajoute 1 :
+
+    $$
+    \text{count\_doc}_{T_2} = 1 + 1 = 2
+    $$
+
+2.  **Affinité “topic”** : nombre de mots de T2 partageant la racine
+    “banque”.\
+    Dans T2 sans \`banque1\$, on trouve $\{\text{banque2}\}$, soit 1 mot
+    avec la même racine. On ajoute 1 :
+
+    $$
+    \text{count\_word}_{T_2} = 1 + 1 = 2
+    $$
+
+L’affinité totale avec T2 est alors :
+
+$$
+\text{affinité}(K_2) = \text{count\_doc}_{K_2} \times \text{count\_word}_{K_2}
+= 2 \times 2 = 4.
+$$
+
+------------------------------------------------------------------------
+
+#### 3. Probabilités d’affectation
+
+On transforme ces affinités en probabilités :
+
+$$
+P(T_1 \mid \text{banque1}) =
+\frac{\text{affinité}(T_1)}{\text{affinité}(T_1) + \text{affinité}(T_2)}
+= \frac{3}{3 + 4} = \frac{3}{7} \approx 0{,}43,
+$$
+
+$$
+P(T_2 \mid \text{banque1}) =
+\frac{\text{affinité}(T_2)}{\text{affinité}(T_1) + \text{affinité}(T_2)}
+= \frac{4}{3 + 4} = \frac{4}{7} \approx 0{,}57.
+$$
+
+Lors d’une itération de Gibbs, on tire alors un nouveau topic pour
+\`banque1\$ :
+
+-   avec probabilité $\approx 0{,}43$, le mot est affecté à T1,
+-   avec probabilité $\approx 0{,}57$, le mot reste dans T2.
+
+Ce mécanisme est répété pour chaque mot, et sur plusieurs itérations,
+jusqu’à stabilisation des topics.
+
+Appliquons cette méthode d Gibbs avec R :
+
+```{r}
+affinites <- function(topic1, topic2) {
+  
+  print("========== Analyse du topic T1 ==========")
+  
+  # On parcourt T1 de la fin vers le début (pour pouvoir retirer des mots sans casser les indices)
+  for (i in rev(seq_along(topic1))) {
+    
+    print("Mot à placer")
+    print(topic1[i])
+    
+    # Séparation "mot" / "numéro de document"
+    numdoc <- substr(topic1[i], nchar(topic1[i]), nchar(topic1[i]))
+    word   <- substr(topic1[i], 1, nchar(topic1[i]) - 1)
+    
+    ## --- Affinité avec T1 ---
+    topic <- topic1[-i]                             # on retire le mot courant de T1
+    count_doc1 <- 1 + sum(endsWith(topic, numdoc))  # mots du même doc dans T1
+    topic_sans_id <- substr(topic, 1, nchar(topic) - 1)
+    count_word1 <- 1 + sum(word == topic_sans_id)   
+    
+    ## --- Affinité avec T2 ---
+    count_doc2 <- 1 + sum(endsWith(topic2, numdoc)) # mots du même doc dans T2
+    topic_sans_id2 <- substr(topic2, 1, nchar(topic2) - 1)
+    count_word2 <- 1 + sum(word == topic_sans_id2)  
+    
+    ## --- Normalisation par la taille des topics ---
+    taille_T1 <- length(topic)  + 1  
+    taille_T2 <- length(topic2) + 1
+    
+    affinite1 <- (count_doc1 * count_word1) / taille_T1
+    affinite2 <- (count_doc2 * count_word2) / taille_T2
+    
+    print("affinite de ce mot avec topic T1 (normalisée)")
+    print(affinite1)
+    print("affinite de ce mot avec topic T2 (normalisée)")
+    print(affinite2)
+    
+    somme_affinites <- affinite1 + affinite2
+    
+    if (somme_affinites == 0) {
+      chancesT1 <- 0.5
+      chancesT2 <- 0.5
+      print("Aucune affinité, proba 50/50")
+    } else {
+      chancesT1 <- affinite1 / somme_affinites
+      chancesT2 <- affinite2 / somme_affinites
+    }
+    
+    resultat <- sample(c(1, 2), size = 1, prob = c(chancesT1, chancesT2))
+    
+    if (resultat == 2) {
+      topic2 <- c(topic2, topic1[i])  # déplacer le mot vers T2
+      topic1 <- topic1[-i]
+      print("le mot a été déplacé dans l'autre groupe (T2)")
+    } else {
+      print("pas de déplacement du mot")
+    }
+    
+    print("Topics mis à jour")
+    print("T1")
+    print(topic1)
+    print("T2")
+    print(topic2)
+  }
+  
+  print("========== Analyse du topic T2 ==========")
+  
+  # Même travail, mais cette fois en partant de T2 vers T1
+  for (i in rev(seq_along(topic2))) {
+    
+    print("Mot à placer")
+    print(topic2[i])
+    
+    numdoc <- substr(topic2[i], nchar(topic2[i]), nchar(topic2[i]))
+    word   <- substr(topic2[i], 1, nchar(topic2[i]) - 1)
+    
+    ## --- Affinité avec T2 ---
+    topic <- topic2[-i]
+    count_doc2 <- 1 + sum(endsWith(topic, numdoc))
+    topic_sans_id <- substr(topic, 1, nchar(topic) - 1)
+    count_word2 <- 1 + sum(word == topic_sans_id)
+    
+    ## --- Affinité avec T1 ---
+    count_doc1 <- 1 + sum(endsWith(topic1, numdoc))
+    topic_sans_id1 <- substr(topic1, 1, nchar(topic1) - 1)
+    count_word1 <- 1 + sum(word == topic_sans_id1)
+    
+    ## --- Normalisation par la taille des topics ---
+    taille_T2 <- length(topic)  + 1
+    taille_T1 <- length(topic1) + 1
+    
+    affinite2 <- (count_doc2 * count_word2) / taille_T2
+    affinite1 <- (count_doc1 * count_word1) / taille_T1
+    
+    print("affinite de ce mot avec topic T2 (normalisée)")
+    print(affinite2)
+    print("affinite de ce mot avec topic T1 (normalisée)")
+    print(affinite1)
+    
+    somme_affinites <- affinite1 + affinite2
+    
+    if (somme_affinites == 0) {
+      chancesT1 <- 0.5
+      chancesT2 <- 0.5
+      print("Aucune affinité, proba 50/50")
+    } else {
+      chancesT2 <- affinite2 / somme_affinites
+      chancesT1 <- affinite1 / somme_affinites
+    }
+    
+    resultat <- sample(c(1, 2), size = 1, prob = c(chancesT1, chancesT2))
+    
+    if (resultat == 1) {
+      topic1 <- c(topic1, topic2[i])  # déplacer le mot vers T1
+      topic2 <- topic2[-i]
+      print("le mot a été déplacé dans l'autre groupe (T1)")
+    } else {
+      print("pas de déplacement du mot")
+    }
+    
+    print("Topics mis à jour")
+    print("T1")
+    print(topic1)
+    print("T2")
+    print(topic2)
+  }
+  
+  return(list(topic1 = topic1, topic2 = topic2))
+}
+
+```
+
+```{r}
+res <- affinites(T1, T2)
+T1 <- res$topic1
+T2 <- res$topic2
+
+```
